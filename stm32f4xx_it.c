@@ -136,40 +136,21 @@ void PendSV_Handler(void)
 uint8_t 	temp1, temp2, temp3, ind = 0;
 char 			U2_Message[50][20], U6_Message[50][20];
 double 		lat,lon,cor[2];
-uint32_t  time_tick = 0, sample_time = 10000, time_temp = 0; //Default: 10ms sampling times
-uint16_t  EncM1= 0, EncM2 = 0, PreEncM1 = 0, PreEncM2 = 0;
-uint32_t	DisEncM1, DisEncM2;
-double 		VelM1, VelM2, PIDM1, PIDM2, rollM1, rollM2, time, Angle, SetAngle = 0, SendAngle = 0, A_Error, A_Error_dot, Pre_A, Fuzzy;
+uint32_t  time_tick = 0, sample_time = 100000, time_temp = 0; //Default: 10ms sampling times
+double 		time, Angle, SetAngle = 0, SendAngle = 0, A_Error, A_Error_dot, Pre_A, Fuzzy;
 BOOLEAN 	GPS_RxFlag = false, ManAuto_Control = true, Stop = false;
-uint8_t 	multiM1 = 0,multiM2 = 0;
 /*--------------- Functions -------------------*/
 void SampleTime(void)
 {
-	time     = sample_time * pow(10,-4);
-}
-void VelocityControl(void)
-{
-	DisEncM1 = EncM1 + (multiM1-1)*65535;
-	DisEncM2 = EncM2 + (multiM2-1)*65535;
-	rollM1   = (double)(DisEncM1 - PreEncM1)/ 39400;
-  rollM2   = (double)(DisEncM2 - PreEncM2)/ 39400;
-	multiM1  = 1;
-	multiM2  = 1;
-	VelM1 	 = (rollM1 * 60) / time;
-	VelM2 	 = (rollM2 * 60) / time;
-	PIDM1 	 = PID_ControlM1(VelM1,velocity,time);
-  PIDM2 	 = PID_ControlM2(VelM2,velocity,time);
-	Robot_Forward(PIDM1,PIDM2);
-	PreEncM1 = EncM1;
-	PreEncM2 = EncM2;
+	time     = sample_time * pow(10,-6);
 }
 
 void SendData(void)
 {
-	ind 		 = ToChar(VelM1,U6_TxBuffer);
+	ind 		 = ToChar(M1.Velocity,U6_TxBuffer);
 	U6_TxBuffer[ind] = (uint8_t)',';
 	ind++;
-	ind  		+= ToChar(VelM2,&U6_TxBuffer[ind]);
+	ind  		+= ToChar(M2.Velocity,&U6_TxBuffer[ind]);
 	U6_TxBuffer[ind] = (uint8_t)',';
 	ind++;
 	ind   	+= ToChar(Angle,&U6_TxBuffer[ind]);
@@ -187,12 +168,16 @@ void SendData(void)
 		ind++;
 		ind				+= ToChar(cor[1],&U6_TxBuffer[ind]);
 	}
-	U6_TxBuffer[ind] = (uint8_t)'N';
-	ind++;
+	else
+	{
+		U6_TxBuffer[ind] = (uint8_t)'N';
+		ind++;
+	}
 	U6_TxBuffer[ind] = 0x0D;
 	ind++;
 	U6_TxBuffer[ind] = 0x0A;
 	U6_SendData(ind);
+	ind = 0;
 }
 /**
   * @brief  This function handles SysTick Handler.
@@ -210,8 +195,8 @@ void SysTick_Handler(void)
 		time_tick = 0;
 		time_temp = sample_time;
 		SampleTime();
-		EncM1 	 = TIM_GetCounter(TIM3);
-		EncM2		 = TIM_GetCounter(TIM4);
+		M1.Enc 	 = TIM_GetCounter(TIM3);
+		M2.Enc	 = TIM_GetCounter(TIM4);
 		Angle 	 = GetAngle();
 		if(ManAuto_Control)   //Manual control
 		{
@@ -224,31 +209,31 @@ void SysTick_Handler(void)
 			{
 				SetAngle = SetAngle + 360;
 			}
-			A_Error = ToRadian(SetAngle - Angle);
-			A_Error_dot = ToRadian(-(Angle - Pre_A)) / time;
-			Pre_A = Angle;
-			Fuzzy = Defuzzification_Max_Min(K1 * A_Error, K2 * A_Error_dot);
-			DisEncM1 = EncM1 + (multiM1-1)*65535;
-			DisEncM2 = EncM2 + (multiM2-1)*65535;
-			rollM1   = (double)(DisEncM1 - PreEncM1)/ 39400;
-			rollM2   = (double)(DisEncM2 - PreEncM2)/ 39400;
-			multiM1  = 1;
-			multiM2  = 1;
-			VelM1 	 = (rollM1 * 60) / time;
-			VelM2 	 = (rollM2 * 60) / time;
-			if(Fuzzy < 0)
+			//A_Error = ToRadian(SetAngle - Angle);
+			//A_Error_dot = ToRadian(-(Angle - Pre_A)) / time;
+			//Pre_A = Angle;
+			//Fuzzy = Defuzzification_Max_Min(K1 * A_Error, K2 * A_Error_dot);
+			M1.TotalEnc = M1.Enc + (M1.OverFlow - 1)*65535;
+			M2.TotalEnc = M2.Enc + (M2.OverFlow - 1)*65535;
+			M1.Velocity = (((double)(M1.TotalEnc - M1.PreEnc)/ 39400) * 60) / time;
+			M2.Velocity = (((double)(M2.TotalEnc - M2.PreEnc)/ 39400) * 60) / time;
+			M1.OverFlow = 1;
+			M2.OverFlow = 1;
+			/*if(Fuzzy < 0)
 			{
 				PIDM1  = PID_ControlM1(VelM1,velocity,time);
-				PIDM2  = PID_ControlM2(VelM2,velocity + velocity*(-Fuzzy),time);
+				PIDM2  = PID_ControlM2(VelM2,velocity + 0*K3 * (-Fuzzy),time);
 			}
 			else
 			{
-				PIDM1 	 = PID_ControlM1(VelM1,velocity + velocity*Fuzzy,time);
+				PIDM1 	 = PID_ControlM1(VelM1,velocity + 0*K3 * Fuzzy,time);
 				PIDM2 	 = PID_ControlM2(VelM2,velocity,time);
-			}
-			Robot_Forward(PIDM1,PIDM2);
-			PreEncM1 = EncM1;
-			PreEncM2 = EncM2;
+			}*/
+			M1.Duty_Cycle = PID_ControlM1(M1.Velocity,velocity,time);
+			M1.Duty_Cycle	= PID_ControlM2(M2.Velocity,velocity,time);
+			Robot_Backward(M1.Duty_Cycle,M2.Duty_Cycle);
+			M1.PreEnc     = M1.Enc;
+			M2.PreEnc			= M2.Enc;
 			SendData();
 		}
 		else // Stanley control
@@ -333,13 +318,13 @@ void DMA2_Stream2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
 	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
-	multiM1++;
+	M1.OverFlow++;
 }
 
 void TIM4_IRQHandler(void)
 {
 	TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
-	multiM2++;
+	M2.OverFlow++;
 }
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */

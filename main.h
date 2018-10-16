@@ -41,7 +41,7 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 extern uint8_t 				control;
-extern uint16_t 			angle, velocity;
+extern double 				velocity;
 /* Exported functions ------------------------------------------------------- */
 void Delay(uint32_t time);
 #endif /* __MAIN_H */
