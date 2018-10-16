@@ -1,0 +1,21 @@
+--cpu Cortex-M4.fp
+".\system_stm32f4xx.o"
+".\main.o"
+".\stm32f4xx_it.o"
+".\encoder.o"
+".\stm32f4xx_delay.o"
+".\usart_dma_config.o"
+".\functions.o"
+".\e_compass.o"
+".\startup_stm32f411xe.o"
+".\misc.o"
+".\stm32f4xx_usart.o"
+".\stm32f4xx_dma.o"
+".\stm32f4xx_gpio.o"
+".\stm32f4xx_i2c.o"
+".\stm32f4xx_rcc.o"
+".\stm32f4xx_tim.o"
+--strict --scatter ".\UnmannedVehicle.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\UnmannedVehicle.map" -o .\UnmannedVehicle.axf
