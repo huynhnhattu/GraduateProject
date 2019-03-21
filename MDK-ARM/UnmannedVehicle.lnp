@@ -15,6 +15,7 @@
 ".\stm32f4xx_i2c.o"
 ".\stm32f4xx_rcc.o"
 ".\stm32f4xx_tim.o"
+".\stm32f4xx_flash.o"
 --strict --scatter ".\UnmannedVehicle.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

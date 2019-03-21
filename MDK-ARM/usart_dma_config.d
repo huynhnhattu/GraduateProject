@@ -1,11 +1,11 @@
 .\usart_dma_config.o: ..\..\..\Embeded_Project\MyStm_Lib\src\USART_DMA_Config.c
 .\usart_dma_config.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h
 .\usart_dma_config.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\usart_dma_config.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\usart_dma_config.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\usart_dma_config.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\usart_dma_config.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\usart_dma_config.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\usart_dma_config.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\usart_dma_config.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\usart_dma_config.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\usart_dma_config.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\usart_dma_config.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\usart_dma_config.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\usart_dma_config.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

@@ -1,11 +1,11 @@
 .\main.o: ..\main.c
 .\main.o: ..\main.h
 .\main.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\main.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\main.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\main.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\main.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\main.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\main.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\main.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\main.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\main.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\main.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\main.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\main.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h
@@ -37,3 +37,4 @@
 .\main.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\math.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h
+.\main.o: ..\Libraries\CMSIS\Include\core_cm4.h

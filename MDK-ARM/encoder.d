@@ -1,11 +1,11 @@
 .\encoder.o: ..\..\..\Embeded_Project\MyStm_Lib\src\Encoder.c
 .\encoder.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h
 .\encoder.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\encoder.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\encoder.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\encoder.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\encoder.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\encoder.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\encoder.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\encoder.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\encoder.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\encoder.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\encoder.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\encoder.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\encoder.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

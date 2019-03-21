@@ -36,17 +36,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx.h"
-typedef enum
-{
-	false = 0,
-	true
-}BOOLEAN;
-extern uint16_t EncM1, EncM2, PreEncM1, PreEncM2;
-extern BOOLEAN  GPS_RxFlag, ManAuto_Control, Stop;
-extern double 	cor[2], SendAngle;
-extern char     U2_Message[50][20], U6_Message[50][20];
-extern uint32_t	sample_time;
-extern uint8_t 	multi;
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

@@ -1,11 +1,11 @@
 .\functions.o: ..\..\..\Embeded_Project\MyStm_Lib\src\functions.c
 .\functions.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h
 .\functions.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\functions.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\functions.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\functions.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\functions.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\functions.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\functions.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\functions.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\functions.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\functions.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\functions.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\functions.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\functions.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

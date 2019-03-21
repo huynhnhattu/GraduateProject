@@ -1,11 +1,11 @@
 .\e_compass.o: ..\..\..\Embeded_Project\MyStm_Lib\src\E_Compass.c
 .\e_compass.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h
 .\e_compass.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\e_compass.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\e_compass.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\e_compass.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\e_compass.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\e_compass.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\e_compass.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\e_compass.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\e_compass.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\e_compass.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\e_compass.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\e_compass.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\e_compass.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h

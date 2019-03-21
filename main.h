@@ -37,13 +37,15 @@
 #include "Encoder.h"
 #include "E_Compass.h"
 #include "functions.h"
+#include "core_cm4.h"
+#include "stm32f4xx_flash.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
-extern uint8_t 				control;
-extern double 				velocity;
 /* Exported functions ------------------------------------------------------- */
 void Delay(uint32_t time);
+void TIM2_TimeBaseConfig(uint32_t time);
+void Parameters_Init(void);
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

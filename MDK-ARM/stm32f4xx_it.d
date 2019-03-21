@@ -2,11 +2,11 @@
 .\stm32f4xx_it.o: ..\stm32f4xx_it.h
 .\stm32f4xx_it.o: ..\main.h
 .\stm32f4xx_it.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
-.\stm32f4xx_it.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4.h
+.\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cm4.h
 .\stm32f4xx_it.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
-.\stm32f4xx_it.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmInstr.h
-.\stm32f4xx_it.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cmFunc.h
-.\stm32f4xx_it.o: D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include\core_cm4_simd.h
+.\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
+.\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
+.\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cmSimd.h
 .\stm32f4xx_it.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h
 .\stm32f4xx_it.o: ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx_conf.h
 .\stm32f4xx_it.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h
@@ -37,3 +37,4 @@
 .\stm32f4xx_it.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\math.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h
+.\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cm4.h

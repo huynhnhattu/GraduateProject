@@ -10,144 +10,122 @@
 ** Send PC format: VelM1,VelM2,angle,Y/N,xcor,ycor
 **/
 /* Global Variables */
-double 				Mxyz[3], Mx, My, Mz, D;
-char   				dir[2], a, b, *r;
-uint16_t 			counterM1 = 0, counterM2 = 0;
-uint8_t  			control = 0;
-uint8_t       duty = 0;
-double 				velocity = 0;
-
+TIM_TimeBaseInitTypeDef			Main_TIM_Struct;
+NVIC_InitTypeDef						Main_NVIC_Struct;
 /* Function */
-void Peripheral_Config()
+/** @brief  : TIM1 interrupt count config
+**  @agr    : void
+**  @retval : void
+**/
+void TIM2_TimeBaseConfig(uint32_t time)   // ms
 {
-	//USART2_Rx_Config(38400); //GPS USART first priority 
-	USART6_Config(38400); 		//Sending and controling USART1
-	Encoder_Config();
-	ECompass_Config();
-	SysTick_Config(SystemCoreClock/1000000);  // 1us
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);
+	
+	Main_TIM_Struct.TIM_Prescaler  				=  50000 - 1; //ms
+	Main_TIM_Struct.TIM_Period     				=  time*2 - 1;
+	Main_TIM_Struct.TIM_ClockDivision 		=  TIM_CKD_DIV1;
+	Main_TIM_Struct.TIM_CounterMode  			=  TIM_CounterMode_Up;
+	TIM_TimeBaseInit(TIM2,&Main_TIM_Struct);
+	TIM_ITConfig(TIM2,TIM_IT_Update,ENABLE);
+	
+	Main_NVIC_Struct.NVIC_IRQChannel  		=  TIM2_IRQn;
+	Main_NVIC_Struct.NVIC_IRQChannelCmd 	=  ENABLE;
+	Main_NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 1;
+	Main_NVIC_Struct.NVIC_IRQChannelSubPriority = 0;
+	NVIC_Init(&Main_NVIC_Struct);
+	TIM_Cmd(TIM2,ENABLE);
 }
+
+/** @brief  : Peripheral config
+**  @agr    : void
+**  @retval : void
+**/
+void Peripheral_Config(void)
+{
+	USART1_Config(115200);
+	//USART2_Config(9600); 			//GPS USART first priority 
+	USART6_Config(9600); 			//Sending and controling USART1
+	Encoder_Config();				
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_SetPriority(SysTick_IRQn,1);
+	TIM2_TimeBaseConfig(800);
+}
+
+/** @brief  : Delay core clock 100MHZ
+**  @agr    : time
+**  @retval : void
+**/
+void Delay(uint32_t time)
+{
+	while(time--)
+	{};
+}
+
 /** @brief  : Initial parameters for input
 **  @agr    : void
 **  @retval : void
 **/
-void Parameters_Init()
+void Parameters_Init(void)
 {
-	/*----------Fuzzy parameter init ------------------*/
-	/*   Input 1 (e = Set_theta - theta)  */
-	// NB : 0.4 - 1
-	In1_NB.h1 = -2;
-	In1_NB.h2 = -1;
-	In1_NB.h3 = -0.45;
-	In1_NB.h4 = -0.4;
-	// NS : 0.15 - 0.45
-	In1_NS.a1 = -0.45;
-	In1_NS.a2 = -0.2;
-	In1_NS.a3 = -0.15;
-	// ZE : 0 - 0.2
-	In1_ZE.a1 = -0.2;
-	In2_ZE.a2 = 0;
-	In2_ZE.a3 = 0.2;
-	// PS : 0.15 - 0.45
-	In1_PS.a1 = 0.15;
-	In1_PS.a2 = 0.2;
-	In1_PS.a3 = 0.45;
-	// PB : 0.4 - 1
-	In1_PB.h1 = 0.4;
-	In1_PB.h2 = 0.45;
-	In1_PB.h3 = 1;
-	In1_PB.h4 = 2;
-	/* Input 2 (edot = Set_thetadot - thetadot) */
-	// NE : 0.3 - 1
-	In2_NE.h1 = -2;
-	In2_NE.h2 = -1;
-	In2_NE.h3 = -0.4;
-	In2_NE.h4 = -0.3;
-	// ZE : 0 - 0.4
-	In2_ZE.a1 = -0.4;
-	In2_ZE.a2 = 0;
-	In2_ZE.a3 = 0.4;
-	// PO : 0.3 - 1
-	In2_PO.h1 = 0.3;
-	In2_PO.h2 = 0.4;
-	In2_PO.h3 = 1;
-	In2_PO.h4 = 2;
-	/* Output value */
-	NB = -0.75;
-	NM = -0.4;
-	NS = -0.175;
-	ZE = 0;
-	PS = 0.175;
-	PM = 0.4;
-	PB = 0.75;
 	/*------------PID Parameter Init-------------*/
-	M1.Kp 				= 0.25;
-	M1.Ki 				= 0.08;
-	M1.Kd 				= 0.005;
+	M1.Kp 				= 0;
+	M1.Ki 				= 0;
+	M1.Kd 				= 0;
 	M1.Pre2_Error = 0;
 	M1.Pre_Error  = 0;
 	M1.Pre_PID 		= 0;
-	M1.OverFlow   = 0;
+	M1.OverFlow   = 1;
 	M1.PreEnc 		= 0;
-	M2.Kp 				= 0.25;
-	M2.Ki 				= 0.08;
-	M2.Kd 				= 0.005;
+	M1.Duty_Cycle = 0;
+	M2.Kp 				= 0;
+	M2.Ki 				= 0;
+	M2.Kd 				= 0;
 	M2.Pre2_Error = 0;
 	M2.Pre_Error  = 0;
 	M2.Pre_PID 		= 0;
-	M2.OverFlow   = 0;
+	M2.OverFlow   = 1;
 	M2.PreEnc 		= 0;
+	M2.Duty_Cycle = 0;
+	/*------------------Timer Init ---------------------*/
+	Timer.Sample_Time  = 50000;
+	Timer.Time_Count   = 0;
+	Timer.Set_Time     = 50000;
+	/*------------------Angle Control-------------------*/
+	Mag.Pre_Angle = 0;
+	Mag.Set_Angle = 0;
+	Mag.Rx_Angle  = 0;
+	Mag.Rx_Flag = false;
+	/*------------------Stanley Parameter---------------*/
+	GPS_NEO.Pre_CorX = 0;
+	GPS_NEO.Pre_CorY = 0;
+	GPS_NEO.Rx_Flag = false;
+	GPS_NEO.Send_Flag = false;
+	GPS_NEO.NbOfWayPoints = 0;
+	/*------------------Manual Init---------------------*/
+	M1.SetVelocity = 0;
+	M2.SetVelocity = 0;
+	M1.Velocity = 0;
+	M2.Velocity = 0;
+	/*------------------Vehicle init-----------------------*/
+	Veh.Mode = 4;  // 0 - default mode, 1 - auto, 2 - manual, 3 - Calib spin robot mode
+	Veh.ManualCtrlKey = 0;
+	Veh.Max_Velocity = 0.0;
+	Veh.Manual_Angle = 0;
+	Veh.Software_Reset = false;
+	/*------------------Read/Write Message Init-------------*/
 }
-void Delay(uint32_t time)
-{
-	while(time--)
-	{}
-}
+
+
+/*C,0.7,0,0.035,0.35,0.0005,0.2,0.4,0.002*/
 int main(void)
 {
 	Parameters_Init();
-	Peripheral_Config();
+	//Peripheral_Config();
+	//SelectFuzzyOutput(0);
+	//SysTick_Config(SystemCoreClock/1000000);
 	while(1)
 	{
-		switch((char)control)
-		{
-			case 'A': // Left
-				control = 0;
-				//Robot_Forward(
-				break;
-			case 'S': // Back
-				control = 0;
-			  
-				break;
-			case 'W': // Forward
-				control = 0;
-				//Robot_Forward(GetValueFromString(&U6_Message[1][0]),GetValueFromString(&U6_Message[1]
-				break;
-			case 'D': // Right
-				control = 0;
-			
-				break;
-			case 'C': // Config
-				control 		 = 0;
-				Stop    		 = false;
-				velocity 		 = (double)GetValueFromString(&U6_Message[1][0]);
-			  velocity		 = ToRPM(velocity);
-			  SendAngle    = (uint16_t)GetValueFromString(&U6_Message[2][0]);
-				M1.Kp   		 = GetValueFromString(&U6_Message[3][0]);
-			  M1.Ki   		 = GetValueFromString(&U6_Message[4][0]);
-				M1.Kd 			 = GetValueFromString(&U6_Message[5][0]);
-				M2.Kp		 		 = GetValueFromString(&U6_Message[6][0]);
-				M2.Ki  	 		 = GetValueFromString(&U6_Message[7][0]);
-				M2.Kd		 		 = GetValueFromString(&U6_Message[8][0]);
-				break;
-			
-			case 'T': //Sample time for robot
-				control = 0;
-				sample_time = (uint32_t)GetValueFromString(&U6_Message[1][0]);
-				break;
-			
-			case 'R':
-				break;
-		}
+		
 	}
 }
 
