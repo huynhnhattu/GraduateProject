@@ -139,64 +139,31 @@ uint8_t 				temp3, temp2;
 double 					cor[2];
 int    					count = 0;
 /*--------------- Functions -------------------*/
-void SampleTime(void)
-{
-	Timer.T     = Timer.Sample_Time * pow(10,-6);
-}
 void GetVehicleVelocity(void)
 {
 			if(GPIO_ReadOutputDataBit(Dir_GPIOx,Dir_GPIO_Pin_M1) == 0) // Backward up counting
 			{
-				if((M1.Enc - M1.PreEnc) > 0)
-				{
-					M1.TotalEnc = M1.Enc + (M1.OverFlow - 1) * 65535;
-					M1.Velocity = (((double)(M1.TotalEnc - M1.PreEnc)/ 39400) * 60) / Timer.T;
-				}
-				else
-				{
-					M1.Velocity = 0;
-				}
+				M1.Current_Vel = (((double)((M1.Enc + (M1.OverFlow - 1) * 65535) - M1.PreEnc)/ 39400) * 60) / Timer.T;
 			}
 			else // Front down 
 			{
-				if((M1.Enc - M1.PreEnc) < 0)
-				{
-					M1.TotalEnc = (65535 - M1.Enc) + (M1.OverFlow - 1) * 65535;
-					M1.Velocity = (((double)(M1.TotalEnc - (65535 - M1.PreEnc))/ 39400) * 60) / Timer.T;
-				}
-				else
-				{
-					M1.Velocity = 0;
-				}
+				M1.Current_Vel = (((double)(((65535 - M1.Enc) + (M1.OverFlow - 1) * 65535) - (65535 - M1.PreEnc))/ 39400) * 60) / Timer.T;
 			}
-			
+			if(M1.Current_Vel < 0)
+				M1.Current_Vel = 0;
 			if(GPIO_ReadOutputDataBit(Dir_GPIOx,Dir_GPIO_Pin_M2) == 0)
 			{
-				if((M2.Enc - M2.PreEnc) > 0)
-				{
-					M2.TotalEnc = M2.Enc + (M2.OverFlow - 1) * 65535;
-					M2.Velocity = (((double)(M2.TotalEnc - M2.PreEnc)/ 39400) * 60) / Timer.T;
-				}
-				else
-				{
-					M2.Velocity = 0;
-				}
+				M2.Current_Vel = (((double)((M2.Enc + (M2.OverFlow - 1) * 65535) - M2.PreEnc)/ 39400) * 60) / Timer.T;
 			}
 			else 
 			{
-				if((M2.Enc - M2.PreEnc) < 0)
-				{
-					M2.TotalEnc = (65535 - M2.Enc) + (M2.OverFlow - 1) * 65535;
-					M2.Velocity = (((double)(M2.TotalEnc - (65535 - M2.PreEnc))/ 39400) * 60) / Timer.T;
-				}
-				else
-				{
-					M2.Velocity = 0;
-				}
+				M2.Current_Vel = (((double)(((65535 - M2.Enc) + (M2.OverFlow - 1) * 65535) - (65535 - M2.PreEnc))/ 39400) * 60) / Timer.T;
 			}
+			if(M2.Current_Vel < 0)
+				M2.Current_Vel = 0;
 }
 /*$VINFO, M1.SetVelocity, M2.SetVelocity, M1.Velocity, M2Velocity, 
-M1Duty, M2Duty, SetAngle, Angle, GPS.Status, PosX, PosY, CC*/
+SetAngle, Angle, GPS.Status (Y/N), PosX, PosY, lat, lon, CC*/
 int ind = 0;
 void SendData(void)
 {
@@ -207,17 +174,17 @@ void SendData(void)
 	U6_TxBuffer[ind++] = (uint8_t)'F';
 	U6_TxBuffer[ind++] = (uint8_t)'O';
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind     += ToChar(Ang.Duty_Cycle,&U6_TxBuffer[ind]); // Ang duty cyble
+	ind     += ToChar(M1.Set_Vel,&U6_TxBuffer[ind]); // M1 SetVelocity
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(Veh.Mode,&U6_TxBuffer[ind]);
+	ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[ind]); // M2 SetVelocity
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(M1.SetVelocity,&U6_TxBuffer[ind]);
+	ind			+= ToChar(M1.Current_Vel,&U6_TxBuffer[ind]); // M1 Velocity
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(M2.SetVelocity,&U6_TxBuffer[ind]);
+	ind  		+= ToChar(M2.Current_Vel,&U6_TxBuffer[ind]); // M2 velocity
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind 		+= ToChar(M1.Velocity,&U6_TxBuffer[ind]); //M1 velocity
+	ind  		+= ToChar(M1.PID_Out,&U6_TxBuffer[ind]); // M1 PID 
 	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind  		+= ToChar(M2.Velocity,&U6_TxBuffer[ind]); // M2 velocity
+	ind  		+= ToChar(M2.PID_Out,&U6_TxBuffer[ind]); // M2 PID
 	U6_TxBuffer[ind++] = (uint8_t)',';
 	ind			+= ToChar(Mag.Set_Angle,&U6_TxBuffer[ind]); // Set angle
 	U6_TxBuffer[ind++] = (uint8_t)',';
@@ -225,16 +192,7 @@ void SendData(void)
 	U6_TxBuffer[ind++] = (uint8_t)',';
 	if(GPS_NEO.Send_Flag)
 	{
-		GPS_NEO.Send_Flag = false;
 		U6_TxBuffer[ind++] = (uint8_t)'Y';
-		U6_TxBuffer[ind++] = (uint8_t)',';
-		ind   		+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[ind]);
-		U6_TxBuffer[ind++] = (uint8_t)',';
-		ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[ind]);
-		U6_TxBuffer[ind++] = (uint8_t)',';
-		ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[ind]);
-		U6_TxBuffer[ind++] = (uint8_t)',';
-		ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[ind]);
 		U6_TxBuffer[ind++] = (uint8_t)',';
 	}
 	else
@@ -242,6 +200,14 @@ void SendData(void)
 		U6_TxBuffer[ind++] = (uint8_t)'N';
 		U6_TxBuffer[ind++] = (uint8_t)',';
 	}
+	ind   		+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[ind]);
+	U6_TxBuffer[ind++] = (uint8_t)',';
+	ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[ind]);
+	U6_TxBuffer[ind++] = (uint8_t)',';
+	ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[ind]);
+	U6_TxBuffer[ind++] = (uint8_t)',';
+	ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[ind]);
+	U6_TxBuffer[ind++] = (uint8_t)',';
 	uint8_t checksum = LRCCalculate(&U6_TxBuffer[1],ind - 1);
 	U6_TxBuffer[ind++] = ToHex((checksum & 0xF0) >> 4);
 	U6_TxBuffer[ind++] = ToHex(checksum & 0x0F);
@@ -251,15 +217,56 @@ void SendData(void)
 	ind = 0;
 }
 
+/**
+  * @brief  This function Save data to internal flash memory
+  * @param  None
+  * @retval None
+  */
+void SaveDataToInternalFlash(int key)
+{
+	Flash.Length = 0;
+	switch(key)
+	{
+		/* ------ PID parameters ------- */
+		case 1:
+			Flash.Length 			+= ToChar(M1.Kp,&Flash.WriteInBuffer[Flash.Length]);
+			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+			Flash.Length 			+= ToChar(M1.Ki,&Flash.WriteInBuffer[Flash.Length]);
+			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+			Flash.Length 			+= ToChar(M1.Kd,&Flash.WriteInBuffer[Flash.Length]);
+			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+			Flash.Length 			+= ToChar(M2.Kp,&Flash.WriteInBuffer[Flash.Length]);
+			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+			Flash.Length 			+= ToChar(M2.Ki,&Flash.WriteInBuffer[Flash.Length]);
+			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+			Flash.Length 			+= ToChar(M2.Kd,&Flash.WriteInBuffer[Flash.Length]);
+			WriteToFlash(FLASH_Sector_7,FLASH_PIDPara_BaseAddr,Flash.WriteInBuffer,Flash.Length);
+			break;
+		
+		/* ------- Fuzzy parameter -------*/
+		case 2:
+			
+			break;
+	}
+}
+/**
+  * @brief  This function reset motor
+  * @param  None
+  * @retval None
+  */
 void Reset_Motor()
 {
-	Stop_Motor();
-	M1.SetVelocity 				= 0;
-	M2.SetVelocity 				= 0;
+	M1.Set_Vel 				= 0;
+	M2.Set_Vel 				= 0;
 	Veh.Manual_Velocity   = 0;
 	Veh.Manual_Angle 			= 0;
 }
 
+/**
+  * @brief  This function Reset Encoder parameters
+  * @param  None
+  * @retval None
+  */
 void Reset_Encoder()
 {
 		M1.PreEnc = M1.Enc;
@@ -276,19 +283,15 @@ void Reset_Encoder()
 /* M1 - Right motor, M2 - Left motor */
 void SysTick_Handler(void)
 {
-	if(Timer.Time_Count < Timer.Set_Time)
+	if(Timer.Time_Count < Timer.Sample_Time)
 	{
 		Timer.Time_Count++;
 	}
 	else
 	{
 		Timer.Time_Count = 0;
-		Timer.Set_Time   = Timer.Sample_Time;
-		SampleTime();
-		M1.Enc 	     	 = TIM_GetCounter(TIM3);
-		M2.Enc	 		 	 = TIM_GetCounter(TIM4);
-		if(Mag.Rx_Flag)
-			Mag.Angle 	 = Mag.Rx_Angle;
+		PID_UpdateEnc(&M1,TIM_GetCounter(TIM3));
+		PID_UpdateEnc(&M2,TIM_GetCounter(TIM4));
 		switch(Veh.Mode)
 		{
 			/*-------------- Auto mode section ------------------*/
@@ -299,71 +302,46 @@ void SysTick_Handler(void)
 				{
 					GPS_NEO.Rx_Flag = false;
 					GPS_NEO.Send_Flag = true;
-					Mag.Delta_Angle = StanleyControl(GPS_NEO.CorX, GPS_NEO.CorY, Mag.Angle, GPS_NEO.Path_X, GPS_NEO.Path_Y, GPS_NEO.Path_Yaw, GPS_NEO.NbOfWayPoints, Veh.Max_Velocity);
-					Mag.Set_Angle   = fix(Mag.Angle + Mag.Delta_Angle);
+					GPS_StanleyControl(&GPS_NEO);
+					IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
 				}
-				Ang.Duty_Cycle = Defuzzification_Max_Min((double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
-				if(Ang.Duty_Cycle >= 0)
+				Defuzzification_Max_Min(&Mag,(double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
+				if(Mag.Fuzzy_Out >= 0)
 				{
-					M1.SetVelocity = Veh.Max_Velocity;
-					M2.SetVelocity = (1 + fabs(Ang.Duty_Cycle)) * Veh.Max_Velocity;
+					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
+					PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
 				}
 				else
 				{
-					M1.SetVelocity = (1 + fabs(Ang.Duty_Cycle)) * Veh.Max_Velocity;
-					M2.SetVelocity = Veh.Max_Velocity;
+					PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
+					PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
 				}
-				M1.Duty_Cycle = PID_ControlM1(M1.Velocity,M1.SetVelocity,Timer.T);
-				M2.Duty_Cycle = PID_ControlM2(M2.Velocity,M2.SetVelocity,Timer.T);
-				Robot_Forward(M1.Duty_Cycle,M2.Duty_Cycle);   //Forward down counting Set bit
-				Mag.Pre_Angle = Mag.Angle;
+				PID_Compute(&M1);
+				PID_Compute(&M2);
+				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+				IMU_UpdatePreAngle(&Mag);
 				break;
 			
 			/*--------------- Manual mode section ----------------*/
 			/*----------------------------------------------------*/
 			case 2: 
 				GetVehicleVelocity();
-				if(Veh.ManualCtrlKey == 'F')
+				Veh_UpdateVehicleFromKey(&Veh);
+				Defuzzification_Max_Min(&Mag,(double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
+				if(Mag.Fuzzy_Out >= 0)
 				{
-					Reset_Motor();
-				}
-				if(Veh.ManualCtrlKey == 'W')
-				{
-					Veh.Manual_Velocity += 0.2 * Veh.Max_Velocity;
-					SelectFuzzyOutput(Veh.Manual_Velocity);
-				}
-				if(Veh.ManualCtrlKey == 'S')
-				{
-					Veh.Manual_Velocity -= 0.2 * Veh.Max_Velocity;
-					SelectFuzzyOutput(Veh.Manual_Velocity);
-				}
-				if(Veh.Manual_Velocity < 0) Veh.Manual_Velocity = 0;
-				else if(Veh.Manual_Velocity > Veh.Max_Velocity) Veh.Manual_Velocity = Veh.Max_Velocity;
-				if(Veh.ManualCtrlKey == 'A') // Turn left - slow down the left motor
-				{
-					Veh.Manual_Angle -= 30;
-					Mag.Set_Angle = fix(Veh.Manual_Angle + Mag.Angle);
-				}
-				if(Veh.ManualCtrlKey == 'D') // Turn right - slow down the right motor
-				{
-					Veh.Manual_Angle += 30;
-					Mag.Set_Angle = fix(Veh.Manual_Angle + Mag.Angle);
-				}
-				Ang.Duty_Cycle = Defuzzification_Max_Min((double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
-				if(Ang.Duty_Cycle >= 0)
-				{
-					M1.SetVelocity = Veh.Manual_Velocity;
-					M2.SetVelocity = (1 + fabs(Ang.Duty_Cycle)) * Veh.Manual_Velocity;
+					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
+					PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
 				}
 				else
 				{
-					M1.SetVelocity = (1 + fabs(Ang.Duty_Cycle)) * Veh.Manual_Velocity;
-					M2.SetVelocity = Veh.Manual_Velocity;
+					PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
+					PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
 				}
-			  M1.Duty_Cycle = PID_ControlM1(M1.Velocity,M1.SetVelocity,Timer.T); // Right motor
-				M2.Duty_Cycle = PID_ControlM2(M2.Velocity,M2.SetVelocity,Timer.T); // Left motor
-				Robot_Forward(M1.Duty_Cycle,M2.Duty_Cycle);
-				Mag.Pre_Angle = Mag.Angle;
+			  PID_Compute(&M1);
+				PID_Compute(&M2);
+				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+				IMU_UpdatePreAngle(&Mag);
 				Veh.ManualCtrlKey = 0;
 				break;
 			
@@ -371,19 +349,23 @@ void SysTick_Handler(void)
 			/*------------------------------------------------------*/
 			case 3: 
 				GetVehicleVelocity();
-				M1.Duty_Cycle = PID_ControlM1(M1.Velocity,30,Timer.T);
-				M2.Duty_Cycle = PID_ControlM2(M2.Velocity,30,Timer.T);
-				Robot_Spin_ClockWise(M1.Duty_Cycle,M2.Duty_Cycle);
+				PID_UpdateSetVel(&M1,30);
+				PID_UpdateSetVel(&M2,30);
+				PID_Compute(&M1);
+				PID_Compute(&M2);
+				Robot_Spin_ClockWise(M1.PID_Out,M2.PID_Out);
 				break;
 			
 			/*-------------- Test section --------------------------*/
 			/*------------------------------------------------------*/
 			case 4:
 				GetVehicleVelocity();
-				M1.Duty_Cycle = PID_ControlM1(M1.Velocity,30,Timer.T);
-				M2.Duty_Cycle = PID_ControlM2(M2.Velocity,30,Timer.T);
-				Robot_Forward(M1.Duty_Cycle,M2.Duty_Cycle);
-				break;
+				PID_UpdateSetVel(&M1,Veh.Max_Velocity);
+				PID_UpdateSetVel(&M2,Veh.Max_Velocity);
+				PID_Compute(&M1);
+				PID_Compute(&M2);
+				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+			break;
 		}
 		Reset_Encoder();
 	}
@@ -396,11 +378,11 @@ void SysTick_Handler(void)
 void DMA2_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream5,DMA_IT_TCIF5);
-	Mag.Rx_Angle = IMU_GetValue(U1_RxBuffer,3);
-	if(!Mag.Rx_Flag)
+	IMU_UpdateAngle(&Mag,IMU_GetValue(U1_RxBuffer,3));
+	if(!Mag.First_RxFlag)
 	{
-			Mag.Rx_Flag = true;
-			Mag.Set_Angle = Mag.Rx_Angle;
+		Mag.First_RxFlag = true;
+		IMU_UpdateSetAngle(&Mag,Mag.Angle);
 	}
 	DMA_Cmd(DMA2_Stream5,ENABLE);
 }
@@ -432,11 +414,9 @@ void DMA1_Stream5_IRQHandler(void)
 			if(IsValidData(U2.Message[6][0]))
 			{
 				GPS_NEO.Rx_Flag = true;
-				GPS_NEO.Latitude 	 = LLToDegree(GetLatFromString(&U2.Message[1][0]));
-				GPS_NEO.Longitude  = LLToDegree(GetLonFromString(&U2.Message[3][0]));
-				LatLonToUTM(GPS_NEO.Latitude,GPS_NEO.Longitude,cor);
-				GPS_NEO.CorX = cor[0];
-				GPS_NEO.CorY = cor[1];
+				GPS_GetLatFromString(&GPS_NEO,&U2.Message[1][0]);
+				GPS_GetLonFromString(&GPS_NEO,&U2.Message[3][0]);
+				GPS_LatLonToUTM(&GPS_NEO);
 			}
 		}
 	}
@@ -477,7 +457,7 @@ void DMA2_Stream2_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
 	Veh.LengthOfCommands = Readline(U6_RxBuffer,U6.RxTempBuffer);
-//	if(IsCorrectMessage(&U6.RxTempBuffer[1],length - 3,U6.RxTempBuffer[length - 2],U6.RxTempBuffer[length - 1]))
+//	if(IsCorrectMessage(&U6.RxTempBuffer[1],Veh.LengthOfCommands - 3,U6.RxTempBuffer[Veh.LengthOfCommands - 2],U6.RxTempBuffer[Veh.LengthOfCommands - 1]))
 //	{
 	if(1)
 	{
@@ -485,24 +465,21 @@ void DMA2_Stream2_IRQHandler(void)
 		switch(GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
 				/*----------------- Vehicle Config --------------------------*/
-				case 1: 
-					Veh.Max_Velocity 		  		= ToRPM(GetValueFromString(&U6.Message[1][0]));
-					M1.Kp    		  						= GetValueFromString(&U6.Message[2][0]);
-					M1.Ki   		  						= GetValueFromString(&U6.Message[3][0]);
-					M1.Kd 			  						= GetValueFromString(&U6.Message[4][0]);
-					M2.Kp		 		  						= GetValueFromString(&U6.Message[5][0]);
-					M2.Ki 	 		  						= GetValueFromString(&U6.Message[6][0]);
-					M2.Kd		 		  						= GetValueFromString(&U6.Message[7][0]);
+				case 1:
+					Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[1][0])));
+					PID_ParametersUpdate(&M1,GetValueFromString(&U6.Message[2][0]),GetValueFromString(&U6.Message[3][0]),GetValueFromString(&U6.Message[4][0]));
+					PID_ParametersUpdate(&M2,GetValueFromString(&U6.Message[5][0]),GetValueFromString(&U6.Message[6][0]),GetValueFromString(&U6.Message[7][0]));
 					break;
 				
-				/*---------------- Sample time config (us)------------------*/
+				/*---------------- Sample time config (us)------------------*/	
 				case 2: 
-					Timer.Sample_Time = (uint32_t)GetValueFromString(&U6.Message[1][0]);
+					Time_SampleTimeUpdate(&Timer,(uint32_t)GetValueFromString(&U6.Message[1][0]));
+					Time_GetSampleTime(&Timer);
 					break;
 				
 				/*---------------- Send data time config (ms)---------------*/
 				case 3: 
-					Timer.Send_Time = (uint32_t)GetValueFromString(&U6.Message[1][0]);
+					Time_SendTimeUpdate(&Timer,(uint32_t)GetValueFromString(&U6.Message[1][0]));
 					TIM2_TimeBaseConfig(Timer.Send_Time);
 					break;
 				
@@ -522,7 +499,8 @@ void DMA2_Stream2_IRQHandler(void)
 				
 				/*---------------- Software reset --------------------------*/
 				case 5: 
-					Veh.Software_Reset = true;
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
+					NVIC_SystemReset();
 					break;
 				
 				/*---------------- Manual mode config ----------------------*/
@@ -560,19 +538,20 @@ void DMA2_Stream2_IRQHandler(void)
 					GPS_NEO.NbOfWayPoints = U6.Message[1][0] - 48;
 					for(int i = 0; i < GPS_NEO.NbOfWayPoints; i++)
 					{
-						LatLonToUTM(GetValueFromString(&U6.Message[i * 2 + 2][0]),GetValueFromString(&U6.Message[i * 2 + 3][0]),cor);
-						GPS_NEO.Path_X[i] = cor[0];
-						GPS_NEO.Path_Y[i] = cor[1];
+						GPS_GetLatFromString(&GPS_NEO,&U6.Message[i * 2 + 2][0]);
+						GPS_GetLonFromString(&GPS_NEO,&U6.Message[i * 2 + 3][0]);
+						GPS_LatLonToUTM(&GPS_NEO);
+						GPS_NEO.Path_X[i] = GPS_NEO.CorX;
+						GPS_NEO.Path_Y[i] = GPS_NEO.CorY;
 					}
-					CalculatePathCoordinate(GPS_NEO.NbOfWayPoints,GPS_NEO.Path_X,GPS_NEO.Path_Y,GPS_NEO.Path_Yaw);
+					break;
+					
+				/*--------------- Save data in internal flash memory --------*/
+				case 9:
+					SaveDataToInternalFlash(1);
 					break;
 			}
 			U6_SendData(FeedBack(U6_TxBuffer,'1'));
-			if(Veh.Software_Reset)
-			{
-				Veh.Software_Reset = false;
-				NVIC_SystemReset();
-			}
 	}
 	else
 	{

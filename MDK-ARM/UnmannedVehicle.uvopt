@@ -214,32 +214,32 @@
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Mag.Angle</ItemText>
+          <ItemText>U1_RxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>U1_RxBuffer</ItemText>
+          <ItemText>U6_Message[3]</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>U6_Message[3]</ItemText>
+          <ItemText>TuTest</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TuTest</ItemText>
+          <ItemText>TuTest1</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TuTest1</ItemText>
+          <ItemText>TuTest2</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TuTest2</ItemText>
+          <ItemText>U6_RxTempBuffer</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
@@ -249,90 +249,55 @@
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>U6_RxTempBuffer</ItemText>
+          <ItemText>cctest</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cctest</ItemText>
+          <ItemText>c1</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>1</WinNumber>
-          <ItemText>c1</ItemText>
+          <ItemText>c2</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>1</WinNumber>
-          <ItemText>c2</ItemText>
+          <ItemText>length</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>1</WinNumber>
-          <ItemText>length</ItemText>
+          <ItemText>control</ItemText>
         </Ww>
         <Ww>
           <count>26</count>
           <WinNumber>1</WinNumber>
-          <ItemText>M1.Kp</ItemText>
+          <ItemText>U6_Test[0]</ItemText>
         </Ww>
         <Ww>
           <count>27</count>
           <WinNumber>1</WinNumber>
-          <ItemText>M1.Ki</ItemText>
+          <ItemText>U6_TuTest</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>1</WinNumber>
-          <ItemText>control</ItemText>
+          <ItemText>Vehicle.Max_Velocity</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>1</WinNumber>
-          <ItemText>U6_Test[0]</ItemText>
+          <ItemText>M1</ItemText>
         </Ww>
         <Ww>
           <count>30</count>
           <WinNumber>1</WinNumber>
-          <ItemText>U6_TuTest</ItemText>
-        </Ww>
-        <Ww>
-          <count>31</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Vehicle.Max_Velocity</ItemText>
-        </Ww>
-        <Ww>
-          <count>32</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>M1.Kp</ItemText>
-        </Ww>
-        <Ww>
-          <count>33</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>M2.Kp</ItemText>
-        </Ww>
-        <Ww>
-          <count>34</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>M2.Ki</ItemText>
-        </Ww>
-        <Ww>
-          <count>35</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>M2.Kd</ItemText>
-        </Ww>
-        <Ww>
-          <count>36</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>M1</ItemText>
-        </Ww>
-        <Ww>
-          <count>37</count>
-          <WinNumber>1</WinNumber>
           <ItemText>M2</ItemText>
         </Ww>
         <Ww>
-          <count>38</count>
+          <count>31</count>
           <WinNumber>1</WinNumber>
           <ItemText>M3</ItemText>
         </Ww>
@@ -386,197 +351,187 @@
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>M1.Kp</ItemText>
+          <ItemText>pM1</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>M2.Kp</ItemText>
+          <ItemText>pM2</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pM1</ItemText>
+          <ItemText>pVehicle</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pM2</ItemText>
+          <ItemText>M1</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pVehicle</ItemText>
+          <ItemText>test</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>M1</ItemText>
+          <ItemText>*pM</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>M1.Kp</ItemText>
+          <ItemText>*(pM + 1)</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test</ItemText>
+          <ItemText>*pVeh</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*pM</ItemText>
+          <ItemText>*pM1</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*(pM + 1)</ItemText>
+          <ItemText>*pM2</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*pVeh</ItemText>
+          <ItemText>In1_ZE</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*pM1</ItemText>
+          <ItemText>In1_NS</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*pM2</ItemText>
+          <ItemText>In1_PS</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>2</WinNumber>
-          <ItemText>In1_ZE</ItemText>
+          <ItemText>In1_PB</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>2</WinNumber>
-          <ItemText>In1_NS</ItemText>
+          <ItemText>In1_NB</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>2</WinNumber>
-          <ItemText>In1_PS</ItemText>
+          <ItemText>U6_RxTempBuffer</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>2</WinNumber>
-          <ItemText>In1_PB</ItemText>
+          <ItemText>U6_TxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>26</count>
           <WinNumber>2</WinNumber>
-          <ItemText>In1_NB</ItemText>
+          <ItemText>U6_RxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>27</count>
           <WinNumber>2</WinNumber>
-          <ItemText>U6_RxTempBuffer</ItemText>
+          <ItemText>U1_TxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>2</WinNumber>
-          <ItemText>U6_TxBuffer</ItemText>
+          <ItemText>Veh</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>2</WinNumber>
-          <ItemText>U6_RxBuffer</ItemText>
+          <ItemText>U1_RxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>30</count>
           <WinNumber>2</WinNumber>
-          <ItemText>U1_TxBuffer</ItemText>
+          <ItemText>testb[0]</ItemText>
         </Ww>
         <Ww>
           <count>31</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Veh</ItemText>
+          <ItemText>testb[1]</ItemText>
         </Ww>
         <Ww>
           <count>32</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Mag.Angle</ItemText>
+          <ItemText>testb[2]</ItemText>
         </Ww>
         <Ww>
           <count>33</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Mag.Rx_Angle</ItemText>
+          <ItemText>test1</ItemText>
         </Ww>
         <Ww>
           <count>34</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Mag.Set_Angle</ItemText>
+          <ItemText>test2</ItemText>
         </Ww>
         <Ww>
           <count>35</count>
           <WinNumber>2</WinNumber>
-          <ItemText>U1_RxBuffer</ItemText>
+          <ItemText>test3</ItemText>
         </Ww>
         <Ww>
           <count>36</count>
           <WinNumber>2</WinNumber>
-          <ItemText>testb[0]</ItemText>
+          <ItemText>test</ItemText>
         </Ww>
         <Ww>
           <count>37</count>
           <WinNumber>2</WinNumber>
-          <ItemText>testb[1]</ItemText>
+          <ItemText>(null)</ItemText>
         </Ww>
         <Ww>
           <count>38</count>
           <WinNumber>2</WinNumber>
-          <ItemText>testb[2]</ItemText>
+          <ItemText>FLASH_Sector7_BaseAddr</ItemText>
         </Ww>
         <Ww>
           <count>39</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test1</ItemText>
+          <ItemText>*FLASH_Sector7_BaseAddr</ItemText>
         </Ww>
         <Ww>
           <count>40</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test2</ItemText>
+          <ItemText>len</ItemText>
         </Ww>
         <Ww>
           <count>41</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test3</ItemText>
+          <ItemText>result</ItemText>
         </Ww>
         <Ww>
           <count>42</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test</ItemText>
+          <ItemText>U6_RxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>43</count>
           <WinNumber>2</WinNumber>
-          <ItemText>(null)</ItemText>
+          <ItemText>U6_TxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>44</count>
           <WinNumber>2</WinNumber>
-          <ItemText>FLASH_Sector7_BaseAddr</ItemText>
+          <ItemText>PID_M1</ItemText>
         </Ww>
         <Ww>
           <count>45</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*FLASH_Sector7_BaseAddr</ItemText>
-        </Ww>
-        <Ww>
-          <count>46</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>len</ItemText>
-        </Ww>
-        <Ww>
-          <count>47</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>result</ItemText>
+          <ItemText>PID_M2</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
@@ -677,7 +632,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>4</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>

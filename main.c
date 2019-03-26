@@ -48,7 +48,7 @@ void Peripheral_Config(void)
 	Encoder_Config();				
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	NVIC_SetPriority(SysTick_IRQn,1);
-	TIM2_TimeBaseConfig(800);
+	TIM2_TimeBaseConfig(Timer.Send_Time);
 }
 
 /** @brief  : Delay core clock 100MHZ
@@ -61,58 +61,56 @@ void Delay(uint32_t time)
 	{};
 }
 
+/** @brief  : Read PID parameters from internal flash memory
+**  @agr    : void
+**  @retval : void
+**/
+void PID_ReadParametersFromFlash(void)
+{
+	ReadFromFlash(FLASH_PIDPara_BaseAddr,Flash.ReadOutBuffer);
+	GetMessageInfo((char*)Flash.ReadOutBuffer,Flash.Message,',');
+	PID_ParametersUpdate(&M1,GetValueFromString(&Flash.Message[0][0]),GetValueFromString(&Flash.Message[1][0]),GetValueFromString(&Flash.Message[2][0]));
+	PID_ParametersUpdate(&M2,GetValueFromString(&Flash.Message[3][0]),GetValueFromString(&Flash.Message[4][0]),GetValueFromString(&Flash.Message[5][0]));
+}
+
+void PID_SaveManual(void)
+{
+	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.100000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.0050000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.003000,&Flash.WriteInBuffer[Flash.Length]);
+	EraseMemory(FLASH_Sector_7);
+	WriteToFlash(FLASH_Sector_7,FLASH_PIDPara_BaseAddr,Flash.WriteInBuffer,Flash.Length);
+}
 /** @brief  : Initial parameters for input
 **  @agr    : void
 **  @retval : void
 **/
 void Parameters_Init(void)
 {
+	/*-----------------Timer Init ---------------*/
+	Time_ParametersInit(&Timer,50000,800);
+	Time_GetSampleTime(&Timer);
 	/*------------PID Parameter Init-------------*/
-	M1.Kp 				= 0;
-	M1.Ki 				= 0;
-	M1.Kd 				= 0;
-	M1.Pre2_Error = 0;
-	M1.Pre_Error  = 0;
-	M1.Pre_PID 		= 0;
-	M1.OverFlow   = 1;
-	M1.PreEnc 		= 0;
-	M1.Duty_Cycle = 0;
-	M2.Kp 				= 0;
-	M2.Ki 				= 0;
-	M2.Kd 				= 0;
-	M2.Pre2_Error = 0;
-	M2.Pre_Error  = 0;
-	M2.Pre_PID 		= 0;
-	M2.OverFlow   = 1;
-	M2.PreEnc 		= 0;
-	M2.Duty_Cycle = 0;
-	/*------------------Timer Init ---------------------*/
-	Timer.Sample_Time  = 50000;
-	Timer.Time_Count   = 0;
-	Timer.Set_Time     = 50000;
-	/*------------------Angle Control-------------------*/
-	Mag.Pre_Angle = 0;
-	Mag.Set_Angle = 0;
-	Mag.Rx_Angle  = 0;
-	Mag.Rx_Flag = false;
-	/*------------------Stanley Parameter---------------*/
-	GPS_NEO.Pre_CorX = 0;
-	GPS_NEO.Pre_CorY = 0;
-	GPS_NEO.Rx_Flag = false;
-	GPS_NEO.Send_Flag = false;
-	GPS_NEO.NbOfWayPoints = 0;
-	/*------------------Manual Init---------------------*/
-	M1.SetVelocity = 0;
-	M2.SetVelocity = 0;
-	M1.Velocity = 0;
-	M2.Velocity = 0;
-	/*------------------Vehicle init-----------------------*/
-	Veh.Mode = 4;  // 0 - default mode, 1 - auto, 2 - manual, 3 - Calib spin robot mode
-	Veh.ManualCtrlKey = 0;
-	Veh.Max_Velocity = 0.0;
-	Veh.Manual_Angle = 0;
-	Veh.Software_Reset = false;
-	/*------------------Read/Write Message Init-------------*/
+	PID_ReadParametersFromFlash();
+	PID_ParametersInitial(&M1);
+	PID_ParametersInitial(&M2);
+	/*------------Fuzzy parametes Init ----------*/
+	Fuzzy_ParametersInit();
+	/*------------------AngleControl-------------*/
+	IMU_ParametesInit(&Mag);
+	/*------------------StanleyParameter---------*/
+	GPS_ParametersInit(&GPS_NEO);
+	/*------------------Vehicleinit--------------*/
+	Veh_ParametersInit(&Veh);
+	/*------------------Read/Write Message Init--*/
 }
 
 
@@ -120,9 +118,9 @@ void Parameters_Init(void)
 int main(void)
 {
 	Parameters_Init();
-	//Peripheral_Config();
-	//SelectFuzzyOutput(0);
-	//SysTick_Config(SystemCoreClock/1000000);
+	Peripheral_Config();
+	//PID_SaveManual();
+	SysTick_Config(SystemCoreClock/1000000);
 	while(1)
 	{
 		
