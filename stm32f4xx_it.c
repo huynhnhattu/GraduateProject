@@ -229,23 +229,12 @@ void SaveDataToInternalFlash(int key)
 	{
 		/* ------ PID parameters ------- */
 		case 1:
-			Flash.Length 			+= ToChar(M1.Kp,&Flash.WriteInBuffer[Flash.Length]);
-			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-			Flash.Length 			+= ToChar(M1.Ki,&Flash.WriteInBuffer[Flash.Length]);
-			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-			Flash.Length 			+= ToChar(M1.Kd,&Flash.WriteInBuffer[Flash.Length]);
-			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-			Flash.Length 			+= ToChar(M2.Kp,&Flash.WriteInBuffer[Flash.Length]);
-			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-			Flash.Length 			+= ToChar(M2.Ki,&Flash.WriteInBuffer[Flash.Length]);
-			Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-			Flash.Length 			+= ToChar(M2.Kd,&Flash.WriteInBuffer[Flash.Length]);
-			WriteToFlash(FLASH_Sector_7,FLASH_PIDPara_BaseAddr,Flash.WriteInBuffer,Flash.Length);
+			PID_SavePIDParaToFlash(&Flash,&M1,&M2);
 			break;
 		
-		/* ------- Fuzzy parameter -------*/
+		/* ------- GPS parameter -------*/
 		case 2:
-			
+			GPS_SavePathCoordinateToFlash(&GPS_NEO,&Flash);
 			break;
 	}
 }
@@ -262,18 +251,6 @@ void Reset_Motor()
 	Veh.Manual_Angle 			= 0;
 }
 
-/**
-  * @brief  This function Reset Encoder parameters
-  * @param  None
-  * @retval None
-  */
-void Reset_Encoder()
-{
-		M1.PreEnc = M1.Enc;
-		M2.PreEnc = M2.Enc;
-		M1.OverFlow = 1;
-		M2.OverFlow = 1;
-}
 
 /**
   * @brief  This function handles SysTick Handler.
@@ -303,9 +280,10 @@ void SysTick_Handler(void)
 					GPS_NEO.Rx_Flag = false;
 					GPS_NEO.Send_Flag = true;
 					GPS_StanleyControl(&GPS_NEO);
-					IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
+					IMU_UpdateSetAngle(&Mag,&GPS_NEO.Delta_Angle);
 				}
-				Defuzzification_Max_Min(&Mag,(double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
+				IMU_UpdateFuzzyInput(&Mag,&Timer.T);
+				Defuzzification_Max_Min(&Mag);
 				if(Mag.Fuzzy_Out >= 0)
 				{
 					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
@@ -327,7 +305,8 @@ void SysTick_Handler(void)
 			case 2: 
 				GetVehicleVelocity();
 				Veh_UpdateVehicleFromKey(&Veh);
-				Defuzzification_Max_Min(&Mag,(double)((Mag.Set_Angle - Mag.Angle)/180),(double)(-(Mag.Angle - Mag.Pre_Angle)/Timer.T)/30);
+				IMU_UpdateFuzzyInput(&Mag,&Timer.T);
+				Defuzzification_Max_Min(&Mag);
 				if(Mag.Fuzzy_Out >= 0)
 				{
 					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
@@ -367,7 +346,8 @@ void SysTick_Handler(void)
 				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
 			break;
 		}
-		Reset_Encoder();
+		PID_ResetEncoder(&M1);
+		PID_ResetEncoder(&M2);
 	}
 }
 
@@ -382,7 +362,7 @@ void DMA2_Stream5_IRQHandler(void)
 	if(!Mag.First_RxFlag)
 	{
 		Mag.First_RxFlag = true;
-		IMU_UpdateSetAngle(&Mag,Mag.Angle);
+		IMU_UpdateSetAngle(&Mag,&Mag.Angle);
 	}
 	DMA_Cmd(DMA2_Stream5,ENABLE);
 }
@@ -535,15 +515,7 @@ void DMA2_Stream2_IRQHandler(void)
 				
 				/*---------------- Receive path coordinate -----------------*/
 				case 8: 
-					GPS_NEO.NbOfWayPoints = U6.Message[1][0] - 48;
-					for(int i = 0; i < GPS_NEO.NbOfWayPoints; i++)
-					{
-						GPS_GetLatFromString(&GPS_NEO,&U6.Message[i * 2 + 2][0]);
-						GPS_GetLonFromString(&GPS_NEO,&U6.Message[i * 2 + 3][0]);
-						GPS_LatLonToUTM(&GPS_NEO);
-						GPS_NEO.Path_X[i] = GPS_NEO.CorX;
-						GPS_NEO.Path_Y[i] = GPS_NEO.CorY;
-					}
+					GPS_UpdatePathCoordinate(&GPS_NEO,U6.RxTempBuffer);
 					break;
 					
 				/*--------------- Save data in internal flash memory --------*/

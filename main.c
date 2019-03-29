@@ -67,7 +67,7 @@ void Delay(uint32_t time)
 **/
 void PID_ReadParametersFromFlash(void)
 {
-	ReadFromFlash(FLASH_PIDPara_BaseAddr,Flash.ReadOutBuffer);
+	ReadFromFlash(&Flash,FLASH_PIDPara_BaseAddr);
 	GetMessageInfo((char*)Flash.ReadOutBuffer,Flash.Message,',');
 	PID_ParametersUpdate(&M1,GetValueFromString(&Flash.Message[0][0]),GetValueFromString(&Flash.Message[1][0]),GetValueFromString(&Flash.Message[2][0]));
 	PID_ParametersUpdate(&M2,GetValueFromString(&Flash.Message[3][0]),GetValueFromString(&Flash.Message[4][0]),GetValueFromString(&Flash.Message[5][0]));
@@ -75,19 +75,22 @@ void PID_ReadParametersFromFlash(void)
 
 void PID_SaveManual(void)
 {
-	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.300000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.100000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
 	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length    += ToChar(0.400000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
 	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.0050000,&Flash.WriteInBuffer[Flash.Length]);
-	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.003000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.WriteInBuffer[Flash.Length++] = 0x0D;
+	Flash.WriteInBuffer[Flash.Length++] = 0x0A;
 	EraseMemory(FLASH_Sector_7);
-	WriteToFlash(FLASH_Sector_7,FLASH_PIDPara_BaseAddr,Flash.WriteInBuffer,Flash.Length);
+	WriteToFlash(&Flash,FLASH_Sector_7,FLASH_PIDPara_BaseAddr);
+	Flash.Length = 0;
 }
 /** @brief  : Initial parameters for input
 **  @agr    : void
@@ -106,6 +109,7 @@ void Parameters_Init(void)
 	Fuzzy_ParametersInit();
 	/*------------------AngleControl-------------*/
 	IMU_ParametesInit(&Mag);
+	IMU_UpdateFuzzyCoefficients(&Mag,(double)1/180,(double)1/30,(double)1);
 	/*------------------StanleyParameter---------*/
 	GPS_ParametersInit(&GPS_NEO);
 	/*------------------Vehicleinit--------------*/
