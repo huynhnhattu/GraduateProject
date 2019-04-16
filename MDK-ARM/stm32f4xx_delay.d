@@ -29,3 +29,4 @@
 .\stm32f4xx_delay.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
 .\stm32f4xx_delay.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h
 .\stm32f4xx_delay.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h
+.\stm32f4xx_delay.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h

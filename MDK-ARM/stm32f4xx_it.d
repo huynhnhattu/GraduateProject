@@ -32,9 +32,14 @@
 .\stm32f4xx_it.o: ..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h
 .\stm32f4xx_it.o: ..\stm32f4xx_it.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h
+.\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h
 .\stm32f4xx_it.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\math.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h
 .\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h
 .\stm32f4xx_it.o: ..\Libraries\CMSIS\Include\core_cm4.h
+.\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h
+.\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
+.\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h
+.\stm32f4xx_it.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h

@@ -136,8 +136,6 @@ void PendSV_Handler(void)
 /** @Variable **/\
 /*C,0.3,0,0.8,0.5,0.001,0.8,0.3,0.001*/
 uint8_t 				temp3, temp2;
-double 					cor[2];
-int    					count = 0;
 /*--------------- Functions -------------------*/
 void GetVehicleVelocity(void)
 {
@@ -161,60 +159,6 @@ void GetVehicleVelocity(void)
 			}
 			if(M2.Current_Vel < 0)
 				M2.Current_Vel = 0;
-}
-/*$VINFO, M1.SetVelocity, M2.SetVelocity, M1.Velocity, M2Velocity, 
-SetAngle, Angle, GPS.Status (Y/N), PosX, PosY, lat, lon, CC*/
-int ind = 0;
-void SendData(void)
-{
-	U6_TxBuffer[ind++] = (uint8_t)'$';
-	U6_TxBuffer[ind++] = (uint8_t)'V';
-	U6_TxBuffer[ind++] = (uint8_t)'I';
-	U6_TxBuffer[ind++] = (uint8_t)'N';
-	U6_TxBuffer[ind++] = (uint8_t)'F';
-	U6_TxBuffer[ind++] = (uint8_t)'O';
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind     += ToChar(M1.Set_Vel,&U6_TxBuffer[ind]); // M1 SetVelocity
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[ind]); // M2 SetVelocity
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(M1.Current_Vel,&U6_TxBuffer[ind]); // M1 Velocity
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind  		+= ToChar(M2.Current_Vel,&U6_TxBuffer[ind]); // M2 velocity
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind  		+= ToChar(M1.PID_Out,&U6_TxBuffer[ind]); // M1 PID 
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind  		+= ToChar(M2.PID_Out,&U6_TxBuffer[ind]); // M2 PID
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind			+= ToChar(Mag.Set_Angle,&U6_TxBuffer[ind]); // Set angle
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind   	+= ToChar(Mag.Angle,&U6_TxBuffer[ind]); // Current angle
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	if(GPS_NEO.Send_Flag)
-	{
-		U6_TxBuffer[ind++] = (uint8_t)'Y';
-		U6_TxBuffer[ind++] = (uint8_t)',';
-	}
-	else
-	{
-		U6_TxBuffer[ind++] = (uint8_t)'N';
-		U6_TxBuffer[ind++] = (uint8_t)',';
-	}
-	ind   		+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[ind]);
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[ind]);
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[ind]);
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[ind]);
-	U6_TxBuffer[ind++] = (uint8_t)',';
-	uint8_t checksum = LRCCalculate(&U6_TxBuffer[1],ind - 1);
-	U6_TxBuffer[ind++] = ToHex((checksum & 0xF0) >> 4);
-	U6_TxBuffer[ind++] = ToHex(checksum & 0x0F);
-	U6_TxBuffer[ind++] = 0x0D;
-	U6_TxBuffer[ind++] = 0x0A;
-	U6_SendData(ind);
-	ind = 0;
 }
 
 /**
@@ -247,6 +191,7 @@ void Reset_Motor()
 {
 	M1.Set_Vel 				= 0;
 	M2.Set_Vel 				= 0;
+	Robot_Forward(0,0);
 	Veh.Manual_Velocity   = 0;
 	Veh.Manual_Angle 			= 0;
 }
@@ -260,94 +205,30 @@ void Reset_Motor()
 /* M1 - Right motor, M2 - Left motor */
 void SysTick_Handler(void)
 {
-	if(Timer.Time_Count < Timer.Sample_Time)
+	if(!Status_CheckStatus(&VehStt.Veh_Send_Data))
 	{
-		Timer.Time_Count++;
-	}
-	else
-	{
-		Timer.Time_Count = 0;
-		PID_UpdateEnc(&M1,TIM_GetCounter(TIM3));
-		PID_UpdateEnc(&M2,TIM_GetCounter(TIM4));
-		switch(Veh.Mode)
+		if(Timer.Time_Send_Count < Timer.Send_Time)
 		{
-			/*-------------- Auto mode section ------------------*/
-			/*---------------------------------------------------*/
-			case 1: 
-				GetVehicleVelocity();
-				if(GPS_NEO.Rx_Flag)
-				{
-					GPS_NEO.Rx_Flag = false;
-					GPS_NEO.Send_Flag = true;
-					GPS_StanleyControl(&GPS_NEO);
-					IMU_UpdateSetAngle(&Mag,&GPS_NEO.Delta_Angle);
-				}
-				IMU_UpdateFuzzyInput(&Mag,&Timer.T);
-				Defuzzification_Max_Min(&Mag);
-				if(Mag.Fuzzy_Out >= 0)
-				{
-					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
-					PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-				}
-				else
-				{
-					PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-					PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
-				}
-				PID_Compute(&M1);
-				PID_Compute(&M2);
-				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-				IMU_UpdatePreAngle(&Mag);
-				break;
-			
-			/*--------------- Manual mode section ----------------*/
-			/*----------------------------------------------------*/
-			case 2: 
-				GetVehicleVelocity();
-				Veh_UpdateVehicleFromKey(&Veh);
-				IMU_UpdateFuzzyInput(&Mag,&Timer.T);
-				Defuzzification_Max_Min(&Mag);
-				if(Mag.Fuzzy_Out >= 0)
-				{
-					PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
-					PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-				}
-				else
-				{
-					PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-					PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
-				}
-			  PID_Compute(&M1);
-				PID_Compute(&M2);
-				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-				IMU_UpdatePreAngle(&Mag);
-				Veh.ManualCtrlKey = 0;
-				break;
-			
-			/*--------------- Calibration section ------------------*/
-			/*------------------------------------------------------*/
-			case 3: 
-				GetVehicleVelocity();
-				PID_UpdateSetVel(&M1,30);
-				PID_UpdateSetVel(&M2,30);
-				PID_Compute(&M1);
-				PID_Compute(&M2);
-				Robot_Spin_ClockWise(M1.PID_Out,M2.PID_Out);
-				break;
-			
-			/*-------------- Test section --------------------------*/
-			/*------------------------------------------------------*/
-			case 4:
-				GetVehicleVelocity();
-				PID_UpdateSetVel(&M1,Veh.Max_Velocity);
-				PID_UpdateSetVel(&M2,Veh.Max_Velocity);
-				PID_Compute(&M1);
-				PID_Compute(&M2);
-				Robot_Forward(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-			break;
+			Timer.Time_Send_Count++;
 		}
-		PID_ResetEncoder(&M1);
-		PID_ResetEncoder(&M2);
+		else
+		{
+			Timer.Time_Send_Count = 0;
+			Status_UpdateStatus(&VehStt.Veh_Send_Data,Check_OK);
+		}
+	}
+	
+	if(!Status_CheckStatus(&VehStt.Veh_Sample_Time))
+	{
+		if(Timer.Time_Sample_Count < Timer.Sample_Time)
+		{
+			Timer.Time_Sample_Count++;
+		}
+		else
+		{
+			Timer.Time_Sample_Count = 0;
+			Status_UpdateStatus(&VehStt.Veh_Sample_Time,Check_OK);
+		}
 	}
 }
 
@@ -359,10 +240,10 @@ void DMA2_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream5,DMA_IT_TCIF5);
 	IMU_UpdateAngle(&Mag,IMU_GetValue(U1_RxBuffer,3));
-	if(!Mag.First_RxFlag)
+	if(!Status_CheckStatus(&VehStt.IMU_FirstSetAngle))
 	{
-		Mag.First_RxFlag = true;
-		IMU_UpdateSetAngle(&Mag,&Mag.Angle);
+		Status_UpdateStatus(&VehStt.IMU_FirstSetAngle,Check_OK);
+		IMU_UpdateSetAngle(&Mag,0);
 	}
 	DMA_Cmd(DMA2_Stream5,ENABLE);
 }
@@ -385,19 +266,14 @@ void USART2_IRQHandler(void)
 void DMA1_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
-	Readline(U2_RxBuffer,U2.RxTempBuffer);
-	GetMessageInfo((char*)U2.RxTempBuffer,U2.Message,',');
-	if(StringHeaderCompare(&U2.Message[0][0],"$GNGLL"))
+	if(GPS_GetMessage("GNGLL",(char*)U2_RxBuffer,U2.Message))
 	{
-		if(IsCorrectMessage(&U2_RxBuffer[1],46,(uint8_t)U2.Message[7][2],(uint8_t)U2.Message[7][3]))
+		if(IsValidData(U2.Message[6][0]))
 		{
-			if(IsValidData(U2.Message[6][0]))
-			{
-				GPS_NEO.Rx_Flag = true;
-				GPS_GetLatFromString(&GPS_NEO,&U2.Message[1][0]);
-				GPS_GetLonFromString(&GPS_NEO,&U2.Message[3][0]);
-				GPS_LatLonToUTM(&GPS_NEO);
-			}
+			GPS_GetLatFromString(&GPS_NEO,&U2.Message[1][0]);
+			GPS_GetLonFromString(&GPS_NEO,&U2.Message[3][0]);
+			GPS_LatLonToUTM(&GPS_NEO);
+			Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_OK);
 		}
 	}
 	DMA_Cmd(DMA1_Stream5,ENABLE);
@@ -436,108 +312,172 @@ void USART6_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
-	Veh.LengthOfCommands = Readline(U6_RxBuffer,U6.RxTempBuffer);
-//	if(IsCorrectMessage(&U6.RxTempBuffer[1],Veh.LengthOfCommands - 3,U6.RxTempBuffer[Veh.LengthOfCommands - 2],U6.RxTempBuffer[Veh.LengthOfCommands - 1]))
-//	{
-	if(1)
+	DMA_Cmd(DMA2_Stream6,DISABLE);
+	if(Veh_GetCommandMessage((char*)U6_RxBuffer,U6.Message))
 	{
-		GetMessageInfo((char*)U6.RxTempBuffer,U6.Message,',');
-		switch(GetNbOfReceiveHeader(&U6.Message[0][0]))
+		switch((int)GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
 				/*----------------- Vehicle Config --------------------------*/
-				case 1:
+				case None:
+					U6_SendData(FeedBack(U6_TxBuffer,'0'));
+					break;
+				
+				case Vehicle_Config:
 					Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[1][0])));
 					PID_ParametersUpdate(&M1,GetValueFromString(&U6.Message[2][0]),GetValueFromString(&U6.Message[3][0]),GetValueFromString(&U6.Message[4][0]));
 					PID_ParametersUpdate(&M2,GetValueFromString(&U6.Message[5][0]),GetValueFromString(&U6.Message[6][0]),GetValueFromString(&U6.Message[7][0]));
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- Sample time config (us)------------------*/	
-				case 2: 
+				case Sample_Time: 
 					Time_SampleTimeUpdate(&Timer,(uint32_t)GetValueFromString(&U6.Message[1][0]));
 					Time_GetSampleTime(&Timer);
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- Send data time config (ms)---------------*/
-				case 3: 
+				case Send_Time: 
 					Time_SendTimeUpdate(&Timer,(uint32_t)GetValueFromString(&U6.Message[1][0]));
-					TIM2_TimeBaseConfig(Timer.Send_Time);
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- IMU command and read data config --------*/
-				case 4: 
+				case IMU_Config: 
 					U1_TxBuffer[0] = (uint8_t)'$';
 					U1_SendData((uint16_t)IMU_GetCommandMessage(&U6.Message[1][0],&U1_TxBuffer[1]));
 					if((U6.Message[1][0] == 'M') && (U6.Message[1][1] == 'A') && (U6.Message[1][2] == 'G') && (U6.Message[1][3] == '2') && (U6.Message[1][4] == 'D'))
 					{
-						if(Veh.Mode != 3)
+						if(Veh.Mode != Calib_Mode)
 						{
 							Reset_Motor();
-							Veh.Mode = 3;
+							Veh.Mode = Calib_Mode;
+							PID_UpdateSetVel(&M1,30);
+							PID_UpdateSetVel(&M2,30);
 						}
 					}
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- Software reset --------------------------*/
-				case 5: 
+				case Soft_Reset: 
 					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					NVIC_SystemReset();
 					break;
 				
 				/*---------------- Manual mode config ----------------------*/
-				case 6: 
+				case Manual_Config: 
 					if(U6.Message[1][0] == '1')
 					{
-						if(Veh.Mode != 2)
+						if(Veh.Mode != Manual_Mode)
 						{
 							Reset_Motor();
-							Veh.Mode = 2;
+							Veh.Mode = Manual_Mode;
 						}
 					}
 					else if(U6.Message[1][0] == '0')
 						Reset_Motor();
 					else
 						Veh.ManualCtrlKey = U6.Message[1][0];
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- Auto mode config ------------------------*/
-				case 7: 
+				case Auto_Config: 
 					if(U6.Message[1][0] == '1')
 					{
-						if(Veh.Mode != 1)
+						if(Veh.Mode != Auto_Mode)
 						{
 							Reset_Motor();
-							Veh.Mode = 1;
+							Veh.Mode = Auto_Mode;
 						}
 					}
 					else if(U6.Message[1][0] == '0')
 						Reset_Motor();
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 				
 				/*---------------- Receive path coordinate -----------------*/
-				case 8: 
+				case Path_Plan: 
 					GPS_UpdatePathCoordinate(&GPS_NEO,U6.RxTempBuffer);
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 					
 				/*--------------- Save data in internal flash memory --------*/
-				case 9:
+				case Flash_Save:
 					SaveDataToInternalFlash(1);
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
+					break;
+				
+				/*--------------- Save data in internal flash memory --------*/
+				/* Format: $KCTRL,1,max velocity 
+									 $KCTRL,0
+									 $KCTRL,W,S,A,D,level
+				*/
+				case KeyBoard_Control:
+					if(U6.Message[1][0] == '1')
+					{
+						if(Veh.Mode != KeyBoard_Mode)
+						{
+							Reset_Motor();
+							Veh.Mode = KeyBoard_Mode;
+							Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2][0])));
+						}
+					}
+					else if(U6.Message[1][0] == '0')
+					{
+						Veh.Mode = None_Mode;
+						Reset_Motor();
+					}
+					else
+					{
+						if((U6.Message[1][0] == 'W') && (U6.Message[2][0] == '!') && (U6.Message[3][0] == '!') && (U6.Message[4][0] == '!'))
+						{
+							PID_UpdateSetVel(&M1,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+						}
+						else if((U6.Message[1][0] == '!') && (U6.Message[2][0] == '!') && (U6.Message[3][0] == 'A') && (U6.Message[4][0] == '!'))
+						{
+							PID_UpdateSetVel(&M1,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,0);
+						}
+						else if((U6.Message[1][0] == '!') && (U6.Message[2][0] == '!') && (U6.Message[3][0] == '!') && (U6.Message[4][0] == 'D'))
+						{
+							PID_UpdateSetVel(&M1,0);
+							PID_UpdateSetVel(&M2,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+						}
+						else if((U6.Message[1][0] == 'W') && (U6.Message[2][0] == '!') && (U6.Message[3][0] == 'A') && (U6.Message[4][0] == '!'))
+						{
+							PID_UpdateSetVel(&M1,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,(((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity) * 0.6);
+						}
+						else if((U6.Message[1][0] == 'W') && (U6.Message[2][0] == '!') && (U6.Message[3][0] == '!') && (U6.Message[4][0] == 'D'))
+						{
+							PID_UpdateSetVel(&M1,(((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity) * 0.6);
+							PID_UpdateSetVel(&M2,((double)(U6.Message[5][0] - 48)/10) * Veh.Max_Velocity);
+						}
+						else
+						{
+							PID_UpdateSetVel(&M1,0);
+							PID_UpdateSetVel(&M2,0);
+						}
+					}
+					U6_SendData(FeedBack(U6_TxBuffer,'1'));
 					break;
 			}
-			U6_SendData(FeedBack(U6_TxBuffer,'1'));
 	}
 	else
 	{
 		U6_SendData(FeedBack(U6_TxBuffer,'0'));
 	}
-	DMA_Cmd(DMA2_Stream2,ENABLE);
 }
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
 void TIM2_IRQHandler(void)
 {
-	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
-	SendData();
+//	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
+//	SendData();
 }
 /** brief : Encoder interrupt **/
 void TIM3_IRQHandler(void)
@@ -551,6 +491,7 @@ void TIM4_IRQHandler(void)
 	TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
 	M2.OverFlow++;
 }
+
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */

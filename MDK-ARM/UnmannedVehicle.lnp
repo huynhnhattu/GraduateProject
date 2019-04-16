@@ -7,6 +7,8 @@
 ".\usart_dma_config.o"
 ".\functions.o"
 ".\e_compass.o"
+".\srf05.o"
+".\stm32f411_rccenable.o"
 ".\startup_stm32f411xe.o"
 ".\misc.o"
 ".\stm32f4xx_usart.o"

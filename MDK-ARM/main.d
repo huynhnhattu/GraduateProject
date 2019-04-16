@@ -32,9 +32,14 @@
 .\main.o: ..\stm32f4xx_it.h
 .\main.o: ..\main.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h
 .\main.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\math.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h
 .\main.o: ..\Libraries\CMSIS\Include\core_cm4.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
