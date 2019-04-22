@@ -45,6 +45,7 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void Parameters_Init(void);
+extern Srf05_Data	Mid, Left, Right, Back;
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

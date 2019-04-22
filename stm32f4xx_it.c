@@ -230,6 +230,19 @@ void SysTick_Handler(void)
 			Status_UpdateStatus(&VehStt.Veh_Sample_Time,Check_OK);
 		}
 	}
+	
+	if(!Status_CheckStatus(&VehStt.Srf05_TimeOut_Flag))
+	{
+		if(Timer.Srf05_Count < Timer.Srf05_Sample_Time)
+		{
+			Timer.Srf05_Count++;
+		}
+		else
+		{
+			Timer.Srf05_Count = 0;
+			Status_UpdateStatus(&VehStt.Srf05_TimeOut_Flag,Check_OK);
+		}
+	}
 }
 
 /** brief : USART1 interrupt Rx handler **/
@@ -312,8 +325,10 @@ void USART6_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
-	DMA_Cmd(DMA2_Stream6,DISABLE);
-	if(Veh_GetCommandMessage((char*)U6_RxBuffer,U6.Message))
+	GetMessageInfo((char*)U6_RxBuffer,U6.Message,',');
+//	if(Veh_GetCommandMessage((char*)U6_RxBuffer,U6.Message))
+//	{
+	if(1)
 	{
 		switch((int)GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
@@ -352,6 +367,7 @@ void DMA2_Stream2_IRQHandler(void)
 						{
 							Reset_Motor();
 							Veh.Mode = Calib_Mode;
+							Status_UpdateStatus(&VehStt.Veh_SendData_Flag,Check_NOK);
 							PID_UpdateSetVel(&M1,30);
 							PID_UpdateSetVel(&M2,30);
 						}
@@ -470,15 +486,67 @@ void DMA2_Stream2_IRQHandler(void)
 	{
 		U6_SendData(FeedBack(U6_TxBuffer,'0'));
 	}
+	DMA_Cmd(DMA2_Stream2,ENABLE);
 }
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
 void TIM2_IRQHandler(void)
 {
-//	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);
-//	SendData();
+	if(TIM_GetFlagStatus(TIM2,TIM_FLAG_CC1))
+	{
+		TIM_ClearITPendingBit(TIM2,TIM_IT_CC1);
+		if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_15) == 1)
+		{
+			Mid.PulseWidth = TIM_GetCapture1(TIM2);
+		}
+		else
+		{
+			Mid.PulseWidth = TIM_GetCapture1(TIM2) - Mid.PulseWidth;
+			Mid.Distance   = ((double)Mid.PulseWidth / Srf05_Const) / 2;
+		}
+	}
+	else if(TIM_GetFlagStatus(TIM2,TIM_FLAG_CC2))
+	{
+		TIM_ClearITPendingBit(TIM2,TIM_IT_CC2);
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_3) == 1)
+		{
+			Left.PulseWidth = TIM_GetCapture2(TIM2);
+		}
+		else
+		{
+			Left.PulseWidth = TIM_GetCapture2(TIM2) - Left.PulseWidth;
+			Left.Distance   = ((double)Left.PulseWidth / Srf05_Const) / 2;
+		}
+	}
+	else if(TIM_GetFlagStatus(TIM2,TIM_FLAG_CC3))
+	{
+		TIM_ClearITPendingBit(TIM2,TIM_IT_CC3);
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_10) == 1)
+		{
+			Right.PulseWidth = TIM_GetCapture3(TIM2);
+		}
+		else
+		{
+			Right.PulseWidth = TIM_GetCapture3(TIM2) - Right.PulseWidth;
+			Right.Distance   = ((double)Right.PulseWidth / Srf05_Const) / 2;
+		}
+	}
+	else if(TIM_GetFlagStatus(TIM2,TIM_FLAG_CC4))
+	{
+		TIM_ClearITPendingBit(TIM2,TIM_IT_CC4);
+		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_11) == 1)
+		{
+			Back.PulseWidth = TIM_GetCapture4(TIM2);
+		}
+		else
+		{
+			Back.PulseWidth = TIM_GetCapture4(TIM2) - Back.PulseWidth;
+			Back.Distance   = ((double)Back.PulseWidth / Srf05_Const) / 2;
+		}
+	}
 }
+
 /** brief : Encoder interrupt **/
 void TIM3_IRQHandler(void)
 {

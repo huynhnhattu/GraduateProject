@@ -14,15 +14,56 @@
 TIM_TimeBaseInitTypeDef			Main_TIM_Struct;
 NVIC_InitTypeDef						Main_NVIC_Struct;
 Srf05_InitTypeDef						Srf05_Struct;
+Srf05_Data									Mid, Left, Right, Back;
 /* Function */
 void Srf05_MidFront(void)
 {
 	Srf05_Struct.Srf05_ICTIM					= TIM2;
-	Srf05_Struct.Srf05_DelayTIM				= TIM10;
 	Srf05_Struct.Srf05_GPIO						= GPIOA;
-	Srf05_Struct.Srf05_Trigger_Pin 		= GPIO_Pin_15;
-	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_
+	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_15;
+	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_1;
+	Srf05_Struct.Srf05_TIM_IT_CC			= TIM_IT_CC1;
+	Srf05_Struct.Srf05_PreemptionPriority = 2;
+	Srf05_Struct.Srf05_SubPriority		= 0;
+	Srf05_Initial(&Srf05_Struct);
 }
+
+void Srf05_LeftFront(void)
+{
+	Srf05_Struct.Srf05_ICTIM					= TIM2;
+	Srf05_Struct.Srf05_GPIO						= GPIOB;
+	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_3;
+	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_2;
+	Srf05_Struct.Srf05_TIM_IT_CC			= TIM_IT_CC2;
+	Srf05_Struct.Srf05_PreemptionPriority = 2;
+	Srf05_Struct.Srf05_SubPriority		= 1;
+	Srf05_Initial(&Srf05_Struct);
+}
+
+void Srf05_RightFront(void)
+{
+	Srf05_Struct.Srf05_ICTIM					= TIM2;
+	Srf05_Struct.Srf05_GPIO						= GPIOA;
+	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_10;
+	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_3;
+	Srf05_Struct.Srf05_TIM_IT_CC			= TIM_IT_CC3;
+	Srf05_Struct.Srf05_PreemptionPriority = 2;
+	Srf05_Struct.Srf05_SubPriority		= 2;
+	Srf05_Initial(&Srf05_Struct);
+}
+
+void Srf05_BackEnd(void)
+{
+	Srf05_Struct.Srf05_ICTIM					= TIM2;
+	Srf05_Struct.Srf05_GPIO						= GPIOA;
+	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_11;
+	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_4;
+	Srf05_Struct.Srf05_TIM_IT_CC			= TIM_IT_CC4;
+	Srf05_Struct.Srf05_PreemptionPriority = 2;
+	Srf05_Struct.Srf05_SubPriority		= 3;
+	Srf05_Initial(&Srf05_Struct);
+}
+
 /** @brief  : TIM1 interrupt count config
 **  @agr    : void
 **  @retval : void
@@ -52,12 +93,13 @@ void TIM2_TimeBaseConfig(uint32_t time)   // ms
 **/
 void Peripheral_Config(void)
 {
+	Srf05_TriggerPinConfig(GPIOB,GPIO_Pin_2);
+	Srf05_MidFront();
 	USART1_Config(115200);
 	USART2_Config(9600); 			//GPS USART first priority 
 	USART6_Config(9600); 			//Sending and controling USART1
 	Encoder_Config();				
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	NVIC_SetPriority(SysTick_IRQn,1);
 }
 
 /** @brief  : Delay core clock 100MHZ
@@ -84,15 +126,15 @@ void PID_ReadParametersFromFlash(void)
 
 void PID_SaveManual(void)
 {
-	Flash.Length    += ToChar(0.300000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.060000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.080000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
 	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.400000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.050000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
-	Flash.Length    += ToChar(0.200000,&Flash.WriteInBuffer[Flash.Length]);
+	Flash.Length    += ToChar(0.100000,&Flash.WriteInBuffer[Flash.Length]);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
 	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length]);
 	EraseMemory(FLASH_Sector_7);
@@ -185,11 +227,22 @@ int main(void)
 	SysTick_Config(SystemCoreClock/1000000); // (us)
 	while(1)
 	{
+		if(Status_CheckStatus(&VehStt.Srf05_TimeOut_Flag))
+		{
+			Srf05_StartDevice();
+			Srf05_ResetCounter(TIM2);
+			Status_UpdateStatus(&VehStt.Srf05_TimeOut_Flag,Check_NOK);
+		}
+		
 		if(Status_CheckStatus(&VehStt.Veh_Send_Data))
 		{
-			SendData();
+			if(Status_CheckStatus(&VehStt.Veh_SendData_Flag))
+			{
+				//SendData();
+			}
 			Status_UpdateStatus(&VehStt.Veh_Send_Data,Check_NOK);
 		}
+		
 		if(Status_CheckStatus(&VehStt.Veh_Sample_Time))
 		{
 			PID_UpdateEnc(&M1,TIM_GetCounter(TIM3));
@@ -207,20 +260,17 @@ int main(void)
 						GPS_StanleyControl(&GPS_NEO, Timer.T);
 						IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
 					}
+					IMU_UpdateFuzzyInput(&Mag,&Timer.T);
+					Defuzzification_Max_Min(&Mag);
+					if(Mag.Fuzzy_Out >= 0)
+					{
+						PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
+						PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
+					}
 					else
 					{
-						IMU_UpdateFuzzyInput(&Mag,&Timer.T);
-						Defuzzification_Max_Min(&Mag);
-						if(Mag.Fuzzy_Out >= 0)
-						{
-							PID_UpdateSetVel(&M1,Veh.Manual_Velocity);
-							PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-						}
-						else
-						{
-							PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
-							PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
-						}
+						PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Manual_Velocity);
+						PID_UpdateSetVel(&M2,Veh.Manual_Velocity);
 					}
 					if(Status_CheckStatus(&GPS_NEO.Goal_Flag))
 					{

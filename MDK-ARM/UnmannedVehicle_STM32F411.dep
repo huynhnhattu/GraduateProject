@@ -28,8 +28,8 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
-F (..\main.c)(0x5CAF3B2C)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\main.o --omf_browse .\main.crf --depend .\main.d)
-I (..\main.h)(0x5CAF3113)
+F (..\main.c)(0x5CBD93F8)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\main.o --omf_browse .\main.crf --depend .\main.d)
+I (..\main.h)(0x5CBD6311)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x53464854)
@@ -60,16 +60,16 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
 I (..\stm32f4xx_it.h)(0x5CAA2DD9)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h)(0x5CAEDC3B)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CAF3113)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CB88629)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h)(0x5CAF3B2C)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h)(0x5C879DCB)
 I (D:\Keil_v5\ARM\ARMCC\include\math.h)(0x53464854)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h)(0x5C854AC6)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CACC061)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h)(0x5CAF3B2C)
-F (..\stm32f4xx_it.c)(0x5CAF3B2C)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\stm32f4xx_it.o --omf_browse .\stm32f4xx_it.crf --depend .\stm32f4xx_it.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CBD91D2)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h)(0x5CBD69BC)
+F (..\stm32f4xx_it.c)(0x5CBD91D2)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\stm32f4xx_it.o --omf_browse .\stm32f4xx_it.crf --depend .\stm32f4xx_it.d)
 I (..\stm32f4xx_it.h)(0x5CAA2DD9)
-I (..\main.h)(0x5CAF3113)
+I (..\main.h)(0x5CBD6311)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x53464854)
@@ -99,14 +99,14 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h)(0x5CAEDC3B)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CAF3113)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CB88629)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h)(0x5CAF3B2C)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h)(0x5C879DCB)
 I (D:\Keil_v5\ARM\ARMCC\include\math.h)(0x53464854)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\E_Compass.h)(0x5C854AC6)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CACC061)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h)(0x5CAF3B2C)
-F (..\..\..\Embeded_Project\MyStm_Lib\src\Encoder.c)(0x5CA4604B)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\encoder.o --omf_browse .\encoder.crf --depend .\encoder.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CBD91D2)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\srf05.h)(0x5CBD69BC)
+F (..\..\..\Embeded_Project\MyStm_Lib\src\Encoder.c)(0x5CBABA4B)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\encoder.o --omf_browse .\encoder.crf --depend .\encoder.d)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\Encoder.h)(0x5C879DCB)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
@@ -167,8 +167,8 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CAF3113)
-F (..\..\..\Embeded_Project\MyStm_Lib\src\USART_DMA_Config.c)(0x5CAAFAF2)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\usart_dma_config.o --omf_browse .\usart_dma_config.crf --depend .\usart_dma_config.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CB88629)
+F (..\..\..\Embeded_Project\MyStm_Lib\src\USART_DMA_Config.c)(0x5CBABA4B)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\usart_dma_config.o --omf_browse .\usart_dma_config.crf --depend .\usart_dma_config.d)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\USART_DMA_Config.h)(0x5CAF3B2C)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
@@ -198,8 +198,8 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
-F (..\..\..\Embeded_Project\MyStm_Lib\src\functions.c)(0x5CAF3B2C)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\functions.o --omf_browse .\functions.crf --depend .\functions.d)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CACC061)
+F (..\..\..\Embeded_Project\MyStm_Lib\src\functions.c)(0x5CBD91D1)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\functions.o --omf_browse .\functions.crf --depend .\functions.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\functions.h)(0x5CBD91D2)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x53464854)
@@ -260,8 +260,8 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
 I (D:\Keil_v5\ARM\ARMCC\include\math.h)(0x53464854)
-F (..\..\..\Embeded_Project\MyStm_Lib\src\srf05.c)(0x5CAF3B2C)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\srf05.o --omf_browse .\srf05.crf --depend .\srf05.d)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\Srf05.h)(0x5CAF3B2C)
+F (..\..\..\Embeded_Project\MyStm_Lib\src\srf05.c)(0x5CBD94AD)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\srf05.o --omf_browse .\srf05.crf --depend .\srf05.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\Srf05.h)(0x5CBD69BC)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x53464854)
@@ -290,10 +290,10 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x581CC67B)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash_ramfunc.h)(0x581CC67B)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CAF3113)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CB88629)
 I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h)(0x5CAEDC3B)
-F (..\..\..\Embeded_Project\MyStm_Lib\src\stm32f411_RCCEnable.c)(0x5CAF32A1)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\stm32f411_rccenable.o --omf_browse .\stm32f411_rccenable.crf --depend .\stm32f411_rccenable.d)
-I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CAF3113)
+F (..\..\..\Embeded_Project\MyStm_Lib\src\stm32f411_RCCEnable.c)(0x5CB93F91)(-c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\..\Embeded_Project\MyStm_Lib\inc -I..\Libraries\CMSIS\Include --C99 -I D:\Keil_v5\ARM\RV31\INC-I D:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include-I D:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.2.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-DSTM32F411xE -DUSE_STDPERIPH_DRIVER -DSTM32F411xE-o .\stm32f411_rccenable.o --omf_browse .\stm32f411_rccenable.crf --depend .\stm32f411_rccenable.d)
+I (..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h)(0x5CB88629)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x582097AB)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x581CC64D)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x53464854)
