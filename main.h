@@ -44,8 +44,10 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void Parameters_Init(void);
-extern Srf05_Data	Mid, Left, Right, Back;
+void 			Parameters_Init(void);
+extern 		Srf05_Data	Mid, Left, Right, Back;
+void 			StartTimer(TIM_TypeDef *TIMx, uint32_t DelayTime);
+void 			StopTimer(TIM_TypeDef *TIMx);
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
