@@ -464,6 +464,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\Embeded_Project\MyStm_Lib\src\stm32f411_RCCEnable.c</FilePath>
             </File>
+            <File>
+              <FileName>TwoWheelRobot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Embeded_Project\MyStm_Lib\src\TwoWheelRobot.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

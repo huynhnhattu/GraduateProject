@@ -40,6 +40,7 @@
 #include "core_cm4.h"
 #include "stm32f4xx_flash.h"
 #include "srf05.h"
+#include "TwoWheelRobot.h"
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

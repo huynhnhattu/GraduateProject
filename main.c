@@ -21,8 +21,8 @@ Srf05_Data									Mid, Left, Right, Back;
 void Srf05_MidFront(void)
 {
 	Srf05_Struct.Srf05_ICTIM					= TIM2;
-	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOC;
-	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_0;
+	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOD;
+	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_8;
 	Srf05_Struct.Srf05_GPIO_Echo			= GPIOA;
 	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_15;
 	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_1;
@@ -34,18 +34,18 @@ void Srf05_MidFront(void)
 
 void Srf05_StartSensorMid(void)
 {
-	GPIO_ResetBits(GPIOC,GPIO_Pin_0);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_8);
 	Core_Delay_Us(10);
-	GPIO_SetBits(GPIOC,GPIO_Pin_0);
+	GPIO_SetBits(GPIOD,GPIO_Pin_8);
 	Core_Delay_Us(50);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_0);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_8);
 }
 
 void Srf05_LeftFront(void)
 {
 	Srf05_Struct.Srf05_ICTIM					= TIM2;
-	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOC;
-	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_1;
+	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOD;
+	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_9;
 	Srf05_Struct.Srf05_GPIO_Echo			= GPIOB;
 	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_3;
 	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_2;
@@ -57,18 +57,18 @@ void Srf05_LeftFront(void)
 
 void Srf05_StartSensorLeft(void)
 {
-	GPIO_ResetBits(GPIOC,GPIO_Pin_1);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_8);
 	Core_Delay_Us(10);
-	GPIO_SetBits(GPIOC,GPIO_Pin_1);
+	GPIO_SetBits(GPIOD,GPIO_Pin_8);
 	Core_Delay_Us(50);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_1);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_8);
 }
 
 void Srf05_RightFront(void)
 {
 	Srf05_Struct.Srf05_ICTIM					= TIM2;
-	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOC;
-	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_4;
+	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOD;
+	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_10;
 	Srf05_Struct.Srf05_GPIO_Echo			= GPIOB;
 	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_10;
 	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_3;
@@ -80,18 +80,18 @@ void Srf05_RightFront(void)
 
 void Srf05_StartSensorRight(void)
 {
-	GPIO_ResetBits(GPIOC,GPIO_Pin_4);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_10);
 	Core_Delay_Us(10);
-	GPIO_SetBits(GPIOC,GPIO_Pin_4);
+	GPIO_SetBits(GPIOD,GPIO_Pin_10);
 	Core_Delay_Us(50);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_4);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_10);
 }
 
 void Srf05_BackEnd(void)
 {
 	Srf05_Struct.Srf05_ICTIM					= TIM2;
-	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOC;
-	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_5;
+	Srf05_Struct.Srf05_GPIO_Trigger		= GPIOD;
+	Srf05_Struct.Srf05_Trigger_Pin		= GPIO_Pin_11;
 	Srf05_Struct.Srf05_GPIO_Echo			= GPIOB;
 	Srf05_Struct.Srf05_Echo_Pin				= GPIO_Pin_11;
 	Srf05_Struct.Srf05_IC_Channel			= TIM_Channel_4;
@@ -103,11 +103,11 @@ void Srf05_BackEnd(void)
 
 void Srf05_StartSensorBack(void)
 {
-	GPIO_ResetBits(GPIOC,GPIO_Pin_5);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_11);
 	Core_Delay_Us(10);
-	GPIO_SetBits(GPIOC,GPIO_Pin_5);
+	GPIO_SetBits(GPIOD,GPIO_Pin_11);
 	Core_Delay_Us(50);
-	GPIO_ResetBits(GPIOC,GPIO_Pin_5);
+	GPIO_ResetBits(GPIOD,GPIO_Pin_11);
 }
 /** @brief  : TIM1 interrupt count config
 **  @agr    : void
@@ -189,6 +189,37 @@ void Delay(uint32_t time)
 	{};
 }
 
+void GPS_ReadParametersFromFlash(FlashMemory *pflash, GPS *pgps)
+{
+	ReadFromFlash(pflash, FLASH_GPSPara_BaseAddr);
+	GetMessageInfo((char*)pflash->ReadOutBuffer, Flash.Message, ',');
+	pgps->NbOfWayPoints = GetValueFromString(&Flash.Message[0][0]);
+	for(int i = 0; i < pgps->NbOfWayPoints; i++)
+	{
+		pgps->Latitude 			= GetValueFromString(&Flash.Message[i * 2 + 1][0]);
+		pgps->Longitude			= GetValueFromString(&Flash.Message[i * 2 + 2][0]);
+		GPS_LatLonToUTM(pgps);
+		pgps->Path_X[i]			= pgps->CorX;
+		pgps->Path_Y[i]			= pgps->CorY;
+	}
+	GPS_UpdatePathYaw(pgps);
+}
+
+void GPS_SaveManual(void)
+{
+	Flash.Length = 0;
+	Flash.Length += ToChar(2,&Flash.WriteInBuffer[Flash.Length],2);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length += ToChar(10.2565,&Flash.WriteInBuffer[Flash.Length],4);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length += ToChar(106.3256,&Flash.WriteInBuffer[Flash.Length],4);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length += ToChar(10.3536,&Flash.WriteInBuffer[Flash.Length],4);
+	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
+	Flash.Length += ToChar(106.1156,&Flash.WriteInBuffer[Flash.Length],4);
+	EraseMemory(FLASH_Sector_6);
+	WriteToFlash(&Flash,FLASH_Sector_6,FLASH_GPSPara_BaseAddr);
+}
 /** @brief  : Read PID parameters from internal flash memory
 **  @agr    : void
 **  @retval : void
@@ -203,6 +234,7 @@ void PID_ReadParametersFromFlash(void)
 
 void PID_SaveManual(void)
 {
+	Flash.Length		= 0;
 	Flash.Length    += ToChar(0.060000,&Flash.WriteInBuffer[Flash.Length],6);
 	Flash.WriteInBuffer[Flash.Length++] = (uint8_t)',';
 	Flash.Length    += ToChar(0.080000,&Flash.WriteInBuffer[Flash.Length],6);
@@ -216,11 +248,11 @@ void PID_SaveManual(void)
 	Flash.Length    += ToChar(0.001000,&Flash.WriteInBuffer[Flash.Length],6);
 	EraseMemory(FLASH_Sector_7);
 	WriteToFlash(&Flash,FLASH_Sector_7,FLASH_PIDPara_BaseAddr);
-	Flash.Length		= 0;
 }
 
 void SendData(void)
 {
+		Veh.SendData_Ind = 0;
 	if(Status_CheckStatus(&VehStt.Veh_Send_Parameters))
 	{
 		Status_UpdateStatus(&VehStt.Veh_Send_Parameters,Check_NOK);
@@ -263,6 +295,20 @@ void SendData(void)
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'F';
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'O';
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_X[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_Y[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.NbOfWayPoints,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(Mid.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(Left.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(Right.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind     	+= ToChar(Back.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind     	+= ToChar(M1.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 SetVelocity
@@ -291,6 +337,8 @@ void SendData(void)
 		}
 		Veh.SendData_Ind   			+= ToChar(GPS_NEO.GPS_Quality,&U6_TxBuffer[Veh.SendData_Ind],1);
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind   			+= ToChar(Veh.Veh_Error,&U6_TxBuffer[Veh.SendData_Ind],1);
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind   			+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[Veh.SendData_Ind],1);
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[Veh.SendData_Ind],6);
@@ -306,7 +354,6 @@ void SendData(void)
 	U6_TxBuffer[Veh.SendData_Ind++] = 0x0D;
 	U6_TxBuffer[Veh.SendData_Ind++] = 0x0A;
 	U6_SendData(Veh.SendData_Ind);
-	Veh.SendData_Ind = 0;
 }
 
 /** @brief  : Initial parameters for input
@@ -318,6 +365,7 @@ void Parameters_Init(void)
 	/*-----------------Timer Init ---------------*/
 	Time_ParametersInit(&Timer,50000,1000000);
 	Time_GetSampleTime(&Timer);
+	Status_ParametersInit(&VehStt);
 	/*------------PID Parameter Init-------------*/
 	PID_ReadParametersFromFlash();
 	PID_ParametersInitial(&M1);
@@ -328,6 +376,8 @@ void Parameters_Init(void)
 	IMU_ParametesInit(&Mag);
 	IMU_UpdateFuzzyCoefficients(&Mag,(double)1/180,(double)1/30,(double)1);
 	/*------------------StanleyParameter---------*/
+	//GPS_ReadParametersFromFlash(&Flash,&GPS_NEO);
+	EraseMemory(FLASH_Sector_6);
 	GPS_ParametersInit(&GPS_NEO);
 	/*------------------Vehicleinit--------------*/
 	Veh_ParametersInit(&Veh);
@@ -336,6 +386,8 @@ void Parameters_Init(void)
 	Srf05_FirstInit(&Left);
 	Srf05_FirstInit(&Right);
 	Srf05_FirstInit(&Back);
+	/*----------------- Robot two wheel Init-----*/
+	Self_ParametersInit(&selfPosition);
 }
 
 int main(void)
@@ -343,6 +395,7 @@ int main(void)
 	Parameters_Init();
 	Peripheral_Config();
 	//PID_SaveManual();
+	//GPS_SaveManual();
 	SysTick_Config(SystemCoreClock/1000000); // (us)
 	Srf05_StartSensorMid();
 	while(1)
@@ -361,36 +414,48 @@ int main(void)
 				/*-------------- Auto mode section ------------------*/
 				/*---------------------------------------------------*/
 				case Auto_Mode:
-					if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
+					if(Status_CheckStatus(&VehStt.Veh_Auto_Flag))
 					{
-						Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_NOK);
-						GPS_StanleyControl(&GPS_NEO, Timer.T);
-						IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
-					}
-					IMU_UpdateFuzzyInput(&Mag,&Timer.T);
-					Defuzzification_Max_Min(&Mag);
-					if(Mag.Fuzzy_Out >= 0)
-					{
-						PID_UpdateSetVel(&M1,Veh.Max_Velocity);
-						PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
+						if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
+						{
+							Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_NOK);
+							if(GPS_NEO.NbOfWayPoints != 0)
+							{
+								GPS_StanleyControl(&GPS_NEO, Timer.T);
+							}
+							else GPS_NEO.Delta_Angle = 0;
+							IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
+						}
+						IMU_UpdateFuzzyInput(&Mag,&Timer.T);
+						Defuzzification_Max_Min(&Mag);
+						if(Mag.Fuzzy_Out >= 0)
+						{
+							PID_UpdateSetVel(&M1,Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
+						}
+						else
+						{
+							PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,Veh.Max_Velocity);
+						}
+						if(Status_CheckStatus(&GPS_NEO.Goal_Flag))
+						{
+							PID_UpdateSetVel(&M1,0);
+							PID_UpdateSetVel(&M2,0);
+						}
+						PID_Compute(&M1);
+						PID_Compute(&M2);
+						Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+						IMU_UpdatePreAngle(&Mag);
 					}
 					else
-					{
-						PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
-						PID_UpdateSetVel(&M2,Veh.Max_Velocity);
-					}
-					if(Status_CheckStatus(&GPS_NEO.Goal_Flag))
 					{
 						PID_UpdateSetVel(&M1,0);
 						PID_UpdateSetVel(&M2,0);
 					}
-					PID_Compute(&M1);
-					PID_Compute(&M2);
-					Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-					IMU_UpdatePreAngle(&Mag);
 					break;
 				
-				/*--------------- Manual mode section ----------------*/
+				/*--------------- Manual mode section --------------- -*/
 				/*----------------------------------------------------*/
 				/* Notes: This mode is uses for angle control test purposes */
 				case Manual_Mode: 
@@ -460,6 +525,7 @@ int main(void)
 				/*-------------- Test section --------------------------*/
 				/*------------------------------------------------------*/
 				case KeyBoard_Mode:
+					//SelfPositionUpdateParams(&selfPosition,M2.Current_Vel/60,M1.Current_Vel/60,Timer.T);
 					PID_Compute(&M1);
 					PID_Compute(&M2);
 					Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
@@ -485,7 +551,7 @@ int main(void)
 					}
 					else
 					{
-							Mid.Distance = 100;
+							Mid.Distance = 0;
 					}
 					Veh.Srf05_Selected_Sensor++;
 					break;
@@ -497,7 +563,7 @@ int main(void)
 					}
 					else
 					{
-							Left.Distance = 100;
+							Left.Distance = 0;
 					}
 					Veh.Srf05_Selected_Sensor++;
 					break;
@@ -509,7 +575,7 @@ int main(void)
 					}
 					else
 					{
-							Right.Distance = 100;
+							Right.Distance = 0;
 					}
 					Veh.Srf05_Selected_Sensor++;
 					break;
@@ -521,7 +587,7 @@ int main(void)
 					}
 					else
 					{
-							Mid.Distance = 100;
+							Mid.Distance = 0;
 					}
 					Veh.Srf05_Selected_Sensor++;
 					break;

@@ -43,3 +43,4 @@
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f4xx_delay.h
 .\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\stm32f411_RCCEnable.h
+.\main.o: ..\..\..\Embeded_Project\MyStm_Lib\inc\TwoWheelRobot.h

@@ -459,6 +459,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\Embeded_Project\MyStm_Lib\src\srf05.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f411_RCCEnable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Embeded_Project\MyStm_Lib\src\stm32f411_RCCEnable.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

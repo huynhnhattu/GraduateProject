@@ -172,12 +172,12 @@ void SaveDataToInternalFlash(int key)
 	switch(key)
 	{
 		/* ------ PID parameters ------- */
-		case PID_Parameter:
+		case 1:
 			PID_SavePIDParaToFlash(&Flash,&M1,&M2);
 			break;
 		
 		/* ------- GPS parameter -------*/
-		case GPS_Coordinates:
+		case 2:
 			GPS_SavePathCoordinateToFlash(&GPS_NEO,&Flash);
 			break;
 	}
@@ -189,11 +189,14 @@ void SaveDataToInternalFlash(int key)
   */
 void Reset_Motor()
 {
-	M1.Set_Vel 				= 0;
-	M2.Set_Vel 				= 0;
+	PID_UpdateSetVel(&M1,0);
+	PID_UpdateSetVel(&M2,0);
+	PID_ResetPID(&M1);
+	PID_ResetPID(&M2);
 	Stop_Motor();
 	Veh.Manual_Velocity   = 0;
 	Veh.Manual_Angle 			= 0;
+	Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_NOK);
 }
 
 
@@ -279,20 +282,35 @@ void USART2_IRQHandler(void)
 void DMA1_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
-	if(GPS_GetCoordinateMessage(U2_RxBuffer,U2.Message))
+	switch((int)GPS_GetLLQMessage(&GPS_NEO,U2_RxBuffer,U2.Message))
 	{
-		if(IsValidData(U2.Message[6][0]))
-		{
-			GPS_GetLatFromString(&GPS_NEO,&U2.Message[1][0]);
-			GPS_GetLonFromString(&GPS_NEO,&U2.Message[3][0]);
-			GPS_LatLonToUTM(&GPS_NEO);
-			if(GPS_GetQualityFromString(&GPS_NEO,U2_RxBuffer,U2.Message))
-			{
-				GPS_NEO.GPS_Quality = (GPS_Quality)GetValueFromString(&U2.Message[6][0]);
-			}
-			else GPS_NEO.GPS_Quality = Invalid;
+		case Veh_NoneError:
 			Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_OK);
-		}
+			break;
+		
+		case Veh_ReadMessage_Err:
+			
+			break;
+		
+		case Veh_ReadGxGLLMessage_Err:
+			
+			break;
+		
+		case Veh_ReadGxGGAMessage_Err:
+			
+			break;
+		
+		case Veh_GxGLLCheckSum_Err:
+			
+			break;
+		
+		case Veh_GxGGACheckSum_Err:
+			
+			break;
+		
+		case Veh_InvalidGxGLLMessage_Err:
+			
+			break;
 	}
 	DMA_Cmd(DMA1_Stream5,ENABLE);
 }
@@ -407,6 +425,7 @@ void DMA2_Stream2_IRQHandler(void)
 				case Manual_Config: 
 					if(U6.Message[1][0] == '1')
 					{
+						Robot_Forward();
 						Reset_Motor();
 						Veh.Mode = Manual_Mode;
 					}
@@ -427,6 +446,14 @@ void DMA2_Stream2_IRQHandler(void)
 					}
 					else if(U6.Message[1][0] == '0')
 						Reset_Motor();
+					else if(StringHeaderCompare(&U6.Message[1][0],"START"))
+					{
+						Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_OK);
+					}
+					else if(StringHeaderCompare(&U6.Message[1][0],"STOP"))
+					{
+						Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_NOK);
+					}
 					Veh_UpdateMaxVelocity(&Veh,ToRPM(0.3));
 					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					break;
@@ -463,7 +490,7 @@ void DMA2_Stream2_IRQHandler(void)
 							Reset_Motor();
 							Robot_Forward();
 							Veh.Mode = KeyBoard_Mode;
-							Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2][0])));
+							Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2	][0])));
 						}
 					}
 					else if(U6.Message[1][0] == '0')
