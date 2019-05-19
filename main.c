@@ -362,6 +362,8 @@ void SendData(void)
 **/
 void Parameters_Init(void)
 {
+	/*-----------------Error Init ---------------*/
+	Error_ResetIndex(&Veh_Error);
 	/*-----------------Timer Init ---------------*/
 	Time_ParametersInit(&Timer,50000,1000000);
 	Time_GetSampleTime(&Timer);
@@ -396,7 +398,7 @@ int main(void)
 	Peripheral_Config();
 	//PID_SaveManual();
 	//GPS_SaveManual();
-	SysTick_Config(SystemCoreClock/1000000); // (us)
+	SysTick_Config(SystemCoreClock/1000000); // (us)	
 	Srf05_StartSensorMid();
 	while(1)
 	{

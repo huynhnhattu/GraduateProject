@@ -282,35 +282,14 @@ void USART2_IRQHandler(void)
 void DMA1_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
-	switch((int)GPS_GetLLQMessage(&GPS_NEO,U2_RxBuffer,U2.Message))
+	Veh.Veh_Error = GPS_GetLLQMessage(&GPS_NEO,U2_RxBuffer,U2.Message);
+	if(Veh.Veh_Error == Veh_NoneError)
 	{
-		case Veh_NoneError:
-			Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_OK);
-			break;
-		
-		case Veh_ReadMessage_Err:
-			
-			break;
-		
-		case Veh_ReadGxGLLMessage_Err:
-			
-			break;
-		
-		case Veh_ReadGxGGAMessage_Err:
-			
-			break;
-		
-		case Veh_GxGLLCheckSum_Err:
-			
-			break;
-		
-		case Veh_GxGGACheckSum_Err:
-			
-			break;
-		
-		case Veh_InvalidGxGLLMessage_Err:
-			
-			break;
+		Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_OK);
+	}
+	else
+	{
+		Error_AppendError(&Veh_Error,Veh.Veh_Error);
 	}
 	DMA_Cmd(DMA1_Stream5,ENABLE);
 }
@@ -349,10 +328,10 @@ void DMA2_Stream2_IRQHandler(void)
 {	
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
 	GetMessageInfo((char*)U6_RxBuffer,U6.Message,',');
-//	if(Veh_GetCommandMessage((char*)U6_RxBuffer,U6.Message))
-//	{
-	if(1)
+	if(Veh_GetCommandMessage(U6_RxBuffer,U6.Message) == Veh_NoneError)
 	{
+//	if
+//	{
 		switch((int)GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
 				/*----------------- Vehicle Config --------------------------*/
@@ -454,7 +433,7 @@ void DMA2_Stream2_IRQHandler(void)
 					{
 						Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_NOK);
 					}
-					Veh_UpdateMaxVelocity(&Veh,ToRPM(0.3));
+					Veh_UpdateMaxVelocity(&Veh,ToRPM(0.4));
 					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					break;
 				
@@ -490,7 +469,7 @@ void DMA2_Stream2_IRQHandler(void)
 							Reset_Motor();
 							Robot_Forward();
 							Veh.Mode = KeyBoard_Mode;
-							Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2	][0])));
+							Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2][0])));
 						}
 					}
 					else if(U6.Message[1][0] == '0')
