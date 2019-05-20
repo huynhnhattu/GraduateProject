@@ -265,6 +265,8 @@ void SendData(void)
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind     	+= ToChar(Veh.Mode,&U6_TxBuffer[Veh.SendData_Ind],1); 
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+		Veh.SendData_Ind     	+= ToChar(GPS_NEO.NbOfWayPoints,&U6_TxBuffer[Veh.SendData_Ind],1); 
+		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind     	+= ToChar(Veh.Max_Velocity,&U6_TxBuffer[Veh.SendData_Ind],3); 
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 		Veh.SendData_Ind     	+= ToChar(M1.Kp,&U6_TxBuffer[Veh.SendData_Ind],3); 
@@ -421,40 +423,36 @@ int main(void)
 						if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
 						{
 							Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_NOK);
-							if(GPS_NEO.NbOfWayPoints != 0)
-							{
-								GPS_StanleyControl(&GPS_NEO, Timer.T);
-							}
-							else GPS_NEO.Delta_Angle = 0;
+							GPS_StanleyControl(&GPS_NEO, Timer.T);
 							IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
 						}
 						IMU_UpdateFuzzyInput(&Mag,&Timer.T);
 						Defuzzification_Max_Min(&Mag);
 						if(Mag.Fuzzy_Out >= 0)
 						{
-							PID_UpdateSetVel(&M1,Veh.Max_Velocity);
+							PID_UpdateSetVel(&M1,(1 - fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
 							PID_UpdateSetVel(&M2,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
 						}
 						else
 						{
 							PID_UpdateSetVel(&M1,(1 + fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
-							PID_UpdateSetVel(&M2,Veh.Max_Velocity);
+							PID_UpdateSetVel(&M2,(1 - fabs(Mag.Fuzzy_Out)) * Veh.Max_Velocity);
 						}
 						if(Status_CheckStatus(&GPS_NEO.Goal_Flag))
 						{
 							PID_UpdateSetVel(&M1,0);
 							PID_UpdateSetVel(&M2,0);
 						}
-						PID_Compute(&M1);
-						PID_Compute(&M2);
-						Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-						IMU_UpdatePreAngle(&Mag);
 					}
 					else
 					{
 						PID_UpdateSetVel(&M1,0);
 						PID_UpdateSetVel(&M2,0);
 					}
+					PID_Compute(&M1);
+					PID_Compute(&M2);
+					Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+					IMU_UpdatePreAngle(&Mag);
 					break;
 				
 				/*--------------- Manual mode section --------------- -*/
@@ -495,7 +493,7 @@ int main(void)
 							else
 							{
 								Veh.Distance = 0;
-								if(Veh.TotalDistance < 10)
+								if(Veh.TotalDistance < 20)
 								{
 									Veh.TotalDistance++;
 								}

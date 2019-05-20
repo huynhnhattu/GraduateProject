@@ -135,7 +135,7 @@ void PendSV_Handler(void)
 }
 /** @Variable **/\
 /*C,0.3,0,0.8,0.5,0.001,0.8,0.3,0.001*/
-uint8_t 				temp3, temp2;
+uint8_t 				temp3, temp2,temp1;
 /*--------------- Functions -------------------*/
 void GetVehicleVelocity(void)
 {
@@ -252,14 +252,25 @@ void SysTick_Handler(void)
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
 /** ----------------------------------------------------------- **/
+void USART1_IRQHandler(void)
+{
+	if(USART_GetITStatus(USART1,USART_IT_IDLE))
+	{
+		USART_ClearFlag(USART1,USART_FLAG_IDLE);
+		temp1 = USART_ReceiveData(USART1);
+		DMA_Cmd(DMA2_Stream5,DISABLE);
+	}
+}
+
 void DMA2_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA2_Stream5,DMA_IT_TCIF5);
-	IMU_UpdateAngle(&Mag,IMU_GetValue(U1_RxBuffer,3));
-	if(!Status_CheckStatus(&VehStt.IMU_FirstSetAngle))
+	Veh.Veh_Error = IMU_GetValueFromMessage(&Mag,U1_RxBuffer);
+	if(Veh.Veh_Error != Veh_NoneError) Error_AppendError(&Veh_Error,Veh.Veh_Error);
+	if((!Status_CheckStatus(&VehStt.IMU_FirstSetAngle)) && (Mag.Angle != 0))
 	{
-		Status_UpdateStatus(&VehStt.IMU_FirstSetAngle,Check_OK);
 		IMU_UpdateSetAngle(&Mag,0);
+		Status_UpdateStatus(&VehStt.IMU_FirstSetAngle,Check_OK);
 	}
 	DMA_Cmd(DMA2_Stream5,ENABLE);
 }
@@ -282,8 +293,8 @@ void USART2_IRQHandler(void)
 void DMA1_Stream5_IRQHandler(void)
 {
 	DMA_ClearITPendingBit(DMA1_Stream5,DMA_IT_TCIF5);
-	Veh.Veh_Error = GPS_GetLLQMessage(&GPS_NEO,U2_RxBuffer,U2.Message);
-	if(Veh.Veh_Error == Veh_NoneError)
+	GPS_NEO.GPS_Error = GPS_GetLLQMessage(&GPS_NEO,U2_RxBuffer,U2.Message);
+	if(GPS_NEO.GPS_Error == Veh_NoneError)
 	{
 		Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_OK);
 	}
@@ -327,11 +338,8 @@ void USART6_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void)
 {	
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
-	GetMessageInfo((char*)U6_RxBuffer,U6.Message,',');
 	if(Veh_GetCommandMessage(U6_RxBuffer,U6.Message) == Veh_NoneError)
 	{
-//	if
-//	{
 		switch((int)GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
 				/*----------------- Vehicle Config --------------------------*/
@@ -397,7 +405,11 @@ void DMA2_Stream2_IRQHandler(void)
 				/*---------------- Software reset --------------------------*/
 				case Soft_Reset: 
 					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
-					NVIC_SystemReset();
+					StartTimer(TIM5,1000);
+					if(Status_CheckStatus(&VehStt.Veh_Timer_Finish))
+					{
+						NVIC_SystemReset();
+					}
 					break;
 				
 				/*---------------- Manual mode config ----------------------*/
@@ -407,6 +419,10 @@ void DMA2_Stream2_IRQHandler(void)
 						Robot_Forward();
 						Reset_Motor();
 						Veh.Mode = Manual_Mode;
+						if(Status_CheckStatus(&VehStt.IMU_FirstSetAngle))
+						{
+							IMU_UpdateSetAngle(&Mag,0);
+						}
 					}
 					else if(U6.Message[1][0] == '0')
 						Reset_Motor();
@@ -422,25 +438,56 @@ void DMA2_Stream2_IRQHandler(void)
 						Reset_Motor();
 						Robot_Forward();
 						Veh.Mode = Auto_Mode;
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					}
 					else if(U6.Message[1][0] == '0')
+					{
 						Reset_Motor();
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
+					}
 					else if(StringHeaderCompare(&U6.Message[1][0],"START"))
 					{
-						Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_OK);
+						if(Veh.Mode == Auto_Mode)
+						{
+							if(GPS_NEO.NbOfWayPoints != 0)
+							{
+								Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_OK);
+								Veh_UpdateMaxVelocity(&Veh,0.3);
+								U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
+							}
+							else
+							{
+								Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_NOK);
+								Veh_UpdateMaxVelocity(&Veh,0.0);
+								U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,0"));
+							}
+						}
 					}
 					else if(StringHeaderCompare(&U6.Message[1][0],"STOP"))
 					{
 						Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_NOK);
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					}
-					Veh_UpdateMaxVelocity(&Veh,ToRPM(0.4));
-					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					break;
 				
 				/*---------------- Receive path coordinate -----------------*/
 				case Path_Plan: 
-					GPS_UpdatePathCoordinate(&GPS_NEO,U6_RxBuffer);
-					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1")); 
+					if(StringHeaderCompare(&U6.Message[1][0],"START"))
+					{
+						GPS_NEO.NbOfWayPoints = 0;
+						GPS_ClearPathBuffer(&GPS_NEO);
+						Status_UpdateStatus(&VehStt.GPS_Start_Receive_PathCor,Check_OK);
+					}
+					else if(StringHeaderCompare(&U6.Message[1][0],"STOP"))
+					{
+						GPS_UpdatePathYaw(&GPS_NEO);
+						Status_UpdateStatus(&VehStt.GPS_Start_Receive_PathCor,Check_NOK);
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
+					}
+					else if(Status_CheckStatus(&VehStt.GPS_Start_Receive_PathCor))
+					{
+						GPS_UpdatePathCoordinate(&GPS_NEO,U6_RxBuffer);
+					}
 					break;
 					
 				/*--------------- Save data in internal flash memory --------*/
