@@ -249,54 +249,59 @@ void PID_SaveManual(void)
 	EraseMemory(FLASH_Sector_7);
 	WriteToFlash(&Flash,FLASH_Sector_7,FLASH_PIDPara_BaseAddr);
 }
-
+void SendStatusData(void)
+{
+	Veh.SendData_Ind = 0;
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'E';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'H';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'S';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'T';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(Veh.Mode,&U6_TxBuffer[Veh.SendData_Ind],1); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(GPS_NEO.NbOfWayPoints,&U6_TxBuffer[Veh.SendData_Ind],1); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(GPS_NEO.K,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(Veh.Max_Velocity,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M1.Kp,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M1.Ki,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M1.Kd,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M2.Kp,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M2.Ki,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(M2.Kd,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(Mag.Ke,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(Mag.Kedot,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind     	+= ToChar(Mag.Ku,&U6_TxBuffer[Veh.SendData_Ind],3); 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	uint8_t checksum = LRCCalculate(&U6_TxBuffer[1],Veh.SendData_Ind - 1);
+	U6_TxBuffer[Veh.SendData_Ind++] = ToHex((checksum & 0xF0) >> 4);
+	U6_TxBuffer[Veh.SendData_Ind++] = ToHex(checksum & 0x0F);
+	U6_TxBuffer[Veh.SendData_Ind++] = 0x0D;
+	U6_TxBuffer[Veh.SendData_Ind++] = 0x0A;
+	U6_SendData(Veh.SendData_Ind);
+}
 void SendData(void)
 {
-		Veh.SendData_Ind = 0;
-	if(Status_CheckStatus(&VehStt.Veh_Send_Parameters))
-	{
-		Status_UpdateStatus(&VehStt.Veh_Send_Parameters,Check_NOK);
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'E';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'H';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'S';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'T';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(Veh.Mode,&U6_TxBuffer[Veh.SendData_Ind],1); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(GPS_NEO.NbOfWayPoints,&U6_TxBuffer[Veh.SendData_Ind],1); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(Veh.Max_Velocity,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M1.Kp,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M1.Ki,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M1.Kd,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M2.Kp,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M2.Ki,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M2.Kd,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(Mag.Ke,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(Mag.Kedot,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(Mag.Ku,&U6_TxBuffer[Veh.SendData_Ind],3); 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-	}
-	else
-	{
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'I';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'N';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'F';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'O';
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind = 0;
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'I';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'N';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'F';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'O';
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 //		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_X[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
 //		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 //		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_Y[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
@@ -311,45 +316,44 @@ void SendData(void)
 //		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 //		Veh.SendData_Ind     	+= ToChar(Back.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
 //		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind     	+= ToChar(M1.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 SetVelocity
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind			+= ToChar(M1.Current_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 Velocity
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind  		+= ToChar(M2.Current_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 velocity
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind  		+= ToChar(M1.PID_Out,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 PID 
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind  		+= ToChar(M2.PID_Out,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 PID
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind			+= ToChar(Mag.Set_Angle,&U6_TxBuffer[Veh.SendData_Ind],3); // Set angle
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind   		+= ToChar(Mag.Angle,&U6_TxBuffer[Veh.SendData_Ind],3); // Current angle
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
-		{
-			U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'Y';
-			U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		}
-		else
-		{
-			U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'N';
-			U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		}
-		Veh.SendData_Ind   			+= ToChar(GPS_NEO.GPS_Quality,&U6_TxBuffer[Veh.SendData_Ind],1);
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind   			+= ToChar(Veh.Veh_Error,&U6_TxBuffer[Veh.SendData_Ind],1);
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind   			+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[Veh.SendData_Ind],1);
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[Veh.SendData_Ind],6);
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[Veh.SendData_Ind],15);
-		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-		Veh.SendData_Ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[Veh.SendData_Ind],15);
+	Veh.SendData_Ind     	+= ToChar(M1.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 SetVelocity
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind			+= ToChar(M1.Current_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 Velocity
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind  		+= ToChar(M2.Current_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 velocity
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind  		+= ToChar(M1.PID_Out,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 PID 
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind  		+= ToChar(M2.PID_Out,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 PID
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind			+= ToChar(Mag.Set_Angle,&U6_TxBuffer[Veh.SendData_Ind],3); // Set angle
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind   		+= ToChar(Mag.Angle,&U6_TxBuffer[Veh.SendData_Ind],3); // Current angle
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
+	{
+		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'Y';
 		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	}
+	else
+	{
+		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'N';
+		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	}
+	Veh.SendData_Ind   			+= ToChar(GPS_NEO.GPS_Quality,&U6_TxBuffer[Veh.SendData_Ind],1);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+//		Veh.SendData_Ind   			+= ToChar(Veh.Veh_Error,&U6_TxBuffer[Veh.SendData_Ind],1);
+//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind   			+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[Veh.SendData_Ind],1);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[Veh.SendData_Ind],6);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[Veh.SendData_Ind],15);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[Veh.SendData_Ind],15);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	uint8_t checksum = LRCCalculate(&U6_TxBuffer[1],Veh.SendData_Ind - 1);
 	U6_TxBuffer[Veh.SendData_Ind++] = ToHex((checksum & 0xF0) >> 4);
 	U6_TxBuffer[Veh.SendData_Ind++] = ToHex(checksum & 0x0F);
@@ -381,7 +385,7 @@ void Parameters_Init(void)
 	IMU_UpdateFuzzyCoefficients(&Mag,(double)1/180,(double)1/30,(double)1);
 	/*------------------StanleyParameter---------*/
 	//GPS_ReadParametersFromFlash(&Flash,&GPS_NEO);
-	EraseMemory(FLASH_Sector_6);
+	//EraseMemory(FLASH_Sector_6);
 	GPS_ParametersInit(&GPS_NEO);
 	/*------------------Vehicleinit--------------*/
 	Veh_ParametersInit(&Veh);
@@ -423,7 +427,7 @@ int main(void)
 						if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
 						{
 							Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_NOK);
-							GPS_StanleyControl(&GPS_NEO, Timer.T);
+							GPS_StanleyControl(&GPS_NEO, Timer.T, M1.Current_Vel, M2.Current_Vel);
 							IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
 						}
 						IMU_UpdateFuzzyInput(&Mag,&Timer.T);
@@ -618,6 +622,12 @@ int main(void)
 			if(Status_CheckStatus(&VehStt.Veh_SendData_Flag))
 			{
 				SendData();
+			}
+			if(Status_CheckStatus(&VehStt.Veh_Send_Parameters))
+			{
+				SendStatusData();
+				Status_UpdateStatus(&VehStt.Veh_SendData_Flag,Check_OK);
+				Status_UpdateStatus(&VehStt.Veh_Send_Parameters,Check_NOK);
 			}
 			Status_UpdateStatus(&VehStt.Veh_Send_Data,Check_NOK);
 		}
