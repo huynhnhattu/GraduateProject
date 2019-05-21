@@ -422,7 +422,7 @@ int main(void)
 				/*-------------- Auto mode section ------------------*/
 				/*---------------------------------------------------*/
 				case Auto_Mode:
-					if(Status_CheckStatus(&VehStt.Veh_Auto_Flag))
+					if(Status_CheckStatus(&VehStt.Veh_Auto_Flag) && ((GPS_NEO.GPS_Quality == RTK_Fixed) || (GPS_NEO.GPS_Quality == RTK_Float))) 
 					{
 						if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
 						{

@@ -3,7 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "C:/Users/DELL-PC/Desktop/Main_Desktop/automation_project/UnmannedVehicle/Control",
+                "C:/Users/DELL-PC/Desktop/Main_Desktop/automation_project/UnmannedVehicle/Control/Libraries/STM32F4xx_StdPeriph_Driver/inc",
+                "C:/Users/DELL-PC/Desktop/Main_Desktop/automation_project/Embeded_Project/MyStm_Lib/inc",
+                "C:/Users/DELL-PC/Desktop/Main_Desktop/automation_project/UnmannedVehicle/Control/Libraries/CMSIS/Device/ST/STM32F4xx/Include",
+                "C:/Users/DELL-PC/Desktop/Main_Desktop/automation_project/UnmannedVehicle/Control/Libraries/CMSIS/Include",
+                "C:/MinGW/lib/gcc/mingw32/6.3.0/include/c++",
+                "${workspaceFolder}/**",
+                "C:/MinGW/lib/gcc/mingw32/6.3.0/include/c++/tr1",
+                "C:/MinGW/lib/gcc/mingw32/6.3.0/include/c++/mingw32"
             ],
             "defines": [
                 "_DEBUG",

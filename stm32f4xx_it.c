@@ -453,7 +453,7 @@ void DMA2_Stream2_IRQHandler(void)
 							if(GPS_NEO.NbOfWayPoints != 0)
 							{
 								Status_UpdateStatus(&VehStt.Veh_Auto_Flag,Check_OK);
-								Veh_UpdateMaxVelocity(&Veh,ToRPM(0.3));
+								Veh_UpdateMaxVelocity(&Veh,ToRPM(0.2));
 								U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 							}
 							else
@@ -471,8 +471,9 @@ void DMA2_Stream2_IRQHandler(void)
 					}
 					else if(StringHeaderCompare(&U6.Message[1][0],"DATA"))
 					{
-						Veh_UpdateMaxVelocity(&Veh,GetValueFromString(&U6.Message[2][0]));
+						Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2][0])));
 						GPS_UpdateParameters(&GPS_NEO,GetValueFromString(&U6.Message[3][0]));
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					}
 					break;
 				
@@ -481,6 +482,7 @@ void DMA2_Stream2_IRQHandler(void)
 					if(StringHeaderCompare(&U6.Message[1][0],"START"))
 					{
 						GPS_NEO.NbOfWayPoints = 0;
+						Status_UpdateStatus(&GPS_NEO.Goal_Flag,Check_NOK);
 						GPS_ClearPathBuffer(&GPS_NEO);
 						Status_UpdateStatus(&VehStt.GPS_Start_Receive_PathCor,Check_OK);
 					}
