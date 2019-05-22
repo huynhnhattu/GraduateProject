@@ -338,8 +338,11 @@ void USART6_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void)
 {	
 	DMA_ClearITPendingBit(DMA2_Stream2,DMA_IT_TCIF2);
+	//GetMessageInfo((char*)&U6_RxBuffer,U6.Message,',');
 	if(Veh_GetCommandMessage(U6_RxBuffer,U6.Message) == Veh_NoneError)
 	{
+//	if(1)
+//	{
 		switch((int)GetNbOfReceiveHeader(&U6.Message[0][0]))
 			{
 				/*----------------- Vehicle Config --------------------------*/
@@ -396,8 +399,8 @@ void DMA2_Stream2_IRQHandler(void)
 						Robot_AntiClockwise();
 						Veh.Mode = Calib_Mode;
 						Status_UpdateStatus(&VehStt.Veh_Calib_Flag,Check_OK);
-						PID_UpdateSetVel(&M1,20);
-						PID_UpdateSetVel(&M2,20);
+						PID_UpdateSetVel(&M1,50);
+						PID_UpdateSetVel(&M2,50);
 						StartTimer(TIM5,3000);
 					}
 					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
@@ -472,7 +475,8 @@ void DMA2_Stream2_IRQHandler(void)
 					else if(StringHeaderCompare(&U6.Message[1][0],"DATA"))
 					{
 						Veh_UpdateMaxVelocity(&Veh,ToRPM(GetValueFromString(&U6.Message[2][0])));
-						GPS_UpdateParameters(&GPS_NEO,GetValueFromString(&U6.Message[3][0]));
+						GPS_UpdateParameters(&GPS_NEO,GetValueFromString(&U6.Message[3][0]),GetValueFromString(&U6.Message[4][0]));
+						
 						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 					}
 					break;
@@ -488,9 +492,11 @@ void DMA2_Stream2_IRQHandler(void)
 					}
 					else if(StringHeaderCompare(&U6.Message[1][0],"STOP"))
 					{
-						GPS_UpdatePathYaw(&GPS_NEO);
 						Status_UpdateStatus(&VehStt.GPS_Start_Receive_PathCor,Check_NOK);
 						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
+						GPS_PathPlanning(&GPS_NEO,GPS_NEO.Step);
+						GPS_UpdatePathYaw(&GPS_NEO);
+						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,VPLAN,1"));
 					}
 					else if(Status_CheckStatus(&VehStt.GPS_Start_Receive_PathCor))
 					{
