@@ -251,7 +251,6 @@ void PID_SaveManual(void)
 }
 void SendStatusData(void)
 {
-	while(!IsDataTransferCompleted()){};
 	Veh.SendData_Ind = 0;
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
@@ -295,7 +294,6 @@ void SendStatusData(void)
 }
 void SendData(void)
 {
-	while(!IsDataTransferCompleted()){};
 	Veh.SendData_Ind = 0;
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';

@@ -358,7 +358,6 @@ void DMA2_Stream2_IRQHandler(void)
 					else if(StringHeaderCompare(&U6.Message[1][0],"STATUS"))
 					{
 						Status_UpdateStatus(&VehStt.Veh_Send_Parameters,Check_OK);
-						Status_UpdateStatus(&VehStt.Veh_SendData_Flag,Check_NOK);
 					}
 					else if(StringHeaderCompare(&U6.Message[1][0],"DATA"))
 					{
@@ -493,6 +492,7 @@ void DMA2_Stream2_IRQHandler(void)
 						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
 						GPS_PathPlanning(&GPS_NEO,GPS_NEO.Step);
 						GPS_UpdatePathYaw(&GPS_NEO);
+						while(!DMA_GetFlagStatus(DMA2_Stream6,DMA_FLAG_TCIF6)){};
 						U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,VPLAN,1"));
 					}
 					else if(Status_CheckStatus(&VehStt.GPS_Start_Receive_PathCor))
