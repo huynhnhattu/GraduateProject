@@ -251,6 +251,7 @@ void PID_SaveManual(void)
 }
 void SendStatusData(void)
 {
+	while(!IsDataTransferCompleted()){};
 	Veh.SendData_Ind = 0;
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
@@ -294,6 +295,7 @@ void SendStatusData(void)
 }
 void SendData(void)
 {
+	while(!IsDataTransferCompleted()){};
 	Veh.SendData_Ind = 0;
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'$';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'V';
@@ -302,20 +304,6 @@ void SendData(void)
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'F';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)'O';
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_X[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.Path_Y[0],&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(GPS_NEO.NbOfWayPoints,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(Mid.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(Left.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(Right.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind     	+= ToChar(Back.Distance,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	Veh.SendData_Ind     	+= ToChar(M1.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M1 SetVelocity
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	Veh.SendData_Ind			+= ToChar(M2.Set_Vel,&U6_TxBuffer[Veh.SendData_Ind],3); // M2 SetVelocity
@@ -344,8 +332,6 @@ void SendData(void)
 	}
 	Veh.SendData_Ind   			+= ToChar(GPS_NEO.GPS_Quality,&U6_TxBuffer[Veh.SendData_Ind],1);
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
-//		Veh.SendData_Ind   			+= ToChar(Veh.Veh_Error,&U6_TxBuffer[Veh.SendData_Ind],1);
-//		U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	Veh.SendData_Ind   			+= ToChar(GPS_NEO.CorX,&U6_TxBuffer[Veh.SendData_Ind],1);
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	Veh.SendData_Ind				+= ToChar(GPS_NEO.CorY,&U6_TxBuffer[Veh.SendData_Ind],6);
@@ -353,6 +339,12 @@ void SendData(void)
 	Veh.SendData_Ind				+= ToChar(GPS_NEO.Latitude,&U6_TxBuffer[Veh.SendData_Ind],15);
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	Veh.SendData_Ind				+= ToChar(GPS_NEO.Longitude,&U6_TxBuffer[Veh.SendData_Ind],15);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.Thetae * (180/pi),&U6_TxBuffer[Veh.SendData_Ind],3);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.Thetad * (180/pi),&U6_TxBuffer[Veh.SendData_Ind],3);
+	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
+	Veh.SendData_Ind				+= ToChar(GPS_NEO.Delta_Angle,&U6_TxBuffer[Veh.SendData_Ind],3);
 	U6_TxBuffer[Veh.SendData_Ind++] = (uint8_t)',';
 	uint8_t checksum = LRCCalculate(&U6_TxBuffer[1],Veh.SendData_Ind - 1);
 	U6_TxBuffer[Veh.SendData_Ind++] = ToHex((checksum & 0xF0) >> 4);
@@ -426,7 +418,6 @@ int main(void)
 					{
 						if(Status_CheckStatus(&VehStt.GPS_Coordinate_Reveived))
 						{
-							Status_UpdateStatus(&VehStt.GPS_Coordinate_Reveived,Check_NOK);
 							GPS_StanleyControl(&GPS_NEO, Timer.T, M1.Current_Vel, M2.Current_Vel);
 							IMU_UpdateSetAngle(&Mag,GPS_NEO.Delta_Angle);
 						}
@@ -447,16 +438,16 @@ int main(void)
 							PID_UpdateSetVel(&M1,0);
 							PID_UpdateSetVel(&M2,0);
 						}
-					}
-					else
-					{
-						PID_UpdateSetVel(&M1,0);
-						PID_UpdateSetVel(&M2,0);
-					}
-					PID_Compute(&M1);
-					PID_Compute(&M2);
-					Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-					IMU_UpdatePreAngle(&Mag);
+				}
+				else
+				{
+					PID_UpdateSetVel(&M1,0);
+					PID_UpdateSetVel(&M2,0);
+				}
+				PID_Compute(&M1);
+				PID_Compute(&M2);
+				Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
+				IMU_UpdatePreAngle(&Mag);
 					break;
 				
 				/*--------------- Manual mode section --------------- -*/
@@ -533,7 +524,14 @@ int main(void)
 					PID_Compute(&M1);
 					PID_Compute(&M2);
 					Robot_Run(M1.PID_Out,M2.PID_Out);   //Forward down counting Set bit
-				break;
+					break;
+				
+				case Soft_Reset_Mode:
+					if(Status_CheckStatus(&VehStt.Veh_Timer_Finish))
+					{
+						NVIC_SystemReset();
+					}
+					break;
 			}
 			PID_ResetEncoder(&M1);
 			PID_ResetEncoder(&M2);
@@ -619,15 +617,17 @@ int main(void)
 		/*--------- Send Data section -------------------------------------*/
 		if(Status_CheckStatus(&VehStt.Veh_Send_Data))
 		{
-			if(Status_CheckStatus(&VehStt.Veh_SendData_Flag))
-			{
-				SendData();
-			}
 			if(Status_CheckStatus(&VehStt.Veh_Send_Parameters))
 			{
 				SendStatusData();
-				Status_UpdateStatus(&VehStt.Veh_SendData_Flag,Check_OK);
 				Status_UpdateStatus(&VehStt.Veh_Send_Parameters,Check_NOK);
+			}
+			else
+			{
+				if(Status_CheckStatus(&VehStt.Veh_SendData_Flag))
+				{
+					SendData();
+				}
 			}
 			Status_UpdateStatus(&VehStt.Veh_Send_Data,Check_NOK);
 		}

@@ -392,7 +392,7 @@ void DMA2_Stream2_IRQHandler(void)
 				
 				/*---------------- IMU command and read data config --------*/
 				case IMU_Config: 
-					if((U6.Message[1][0] == 'M') && (U6.Message[1][1] == 'A') && (U6.Message[1][2] == 'G') && (U6.Message[1][3] == '2') && (U6.Message[1][4] == 'D'))
+					if(StringHeaderCompare(&U6.Message[1][0],"MAG2D"))
 					{
 						U1_SendData(FeedBack(U1_TxBuffer,"$MAG2D"));
 						Reset_Motor();
@@ -409,11 +409,8 @@ void DMA2_Stream2_IRQHandler(void)
 				/*---------------- Software reset --------------------------*/
 				case Soft_Reset: 
 					U6_SendData(FeedBack(U6_TxBuffer,"$SINFO,1"));
-					StartTimer(TIM5,1000);
-					if(Status_CheckStatus(&VehStt.Veh_Timer_Finish))
-					{
-						NVIC_SystemReset();
-					}
+					Veh.Mode = Soft_Reset_Mode;
+					StartTimer(TIM5,2000);
 					break;
 				
 				/*---------------- Manual mode config ----------------------*/
